@@ -54,6 +54,17 @@ export class MongoEmployeeRepository implements EmployeeRepository {
 
     return found && toEmployee(found)
   }
+
+  async softDelete(id: string): Promise<boolean> {
+    const { modifiedCount } = await this.employees
+      .updateOne(
+        { _id: id, deletedAt: null },
+        { $set: { deletedAt: new Date() } },
+      )
+      .exec()
+
+    return modifiedCount === 1
+  }
 }
 
 function isDuplicateKey(
