@@ -5,6 +5,7 @@ import { Model } from 'mongoose'
 import request from 'supertest'
 import { App } from 'supertest/types'
 import { AppModule } from '../src/app.module'
+import { DocumentTypeView } from '../src/document-types/infra/http/dto/document-type.view'
 import { DocumentTypeModel } from '../src/document-types/infra/mongo/document-type.schema'
 
 describe('Document types (e2e)', () => {
@@ -55,6 +56,31 @@ describe('Document types (e2e)', () => {
     expect(response.body).toMatchObject({
       status: 409,
       code: 'DOCUMENT_TYPE_ALREADY_EXISTS',
+    })
+  })
+
+  it('allows a name to be reused once the document type is soft deleted', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/document-types')
+      .send({ name: 'ASO', description: 'Atestado de Saude Ocupacional' })
+      .expect(201)
+
+    await request(app.getHttpServer())
+      .delete(`/document-types/${(created.body as DocumentTypeView).id}`)
+      .expect(204)
+
+    await request(app.getHttpServer())
+      .post('/document-types')
+      .send({ name: 'ASO' })
+      .expect(201)
+
+    const listed = await request(app.getHttpServer())
+      .get('/document-types')
+      .expect(200)
+
+    expect(listed.body).toMatchObject({
+      data: [{ slug: 'aso', description: null }],
+      meta: { total: 1 },
     })
   })
 })
