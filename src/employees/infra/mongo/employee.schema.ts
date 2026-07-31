@@ -21,3 +21,13 @@ export class EmployeeModel {
 export type EmployeeDocument = HydratedDocument<EmployeeModel>
 
 export const EmployeeSchema = SchemaFactory.createForClass(EmployeeModel)
+
+EmployeeSchema.index(
+  { cpf: 1 },
+  { unique: true, partialFilterExpression: { deletedAt: null } },
+)
+
+EmployeeSchema.index(
+  { email: 1 },
+  { unique: true, partialFilterExpression: { deletedAt: null } },
+)
