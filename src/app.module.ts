@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { validateEnvironment } from './config/env.validation'
+import { HealthController } from './shared/http/health.controller'
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { validateEnvironment } from './config/env.validation'
       }),
     }),
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService],
 })
 export class AppModule {}
