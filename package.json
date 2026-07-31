@@ -16,6 +16,8 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,test}/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
