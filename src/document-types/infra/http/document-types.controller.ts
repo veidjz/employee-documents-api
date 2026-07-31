@@ -1,8 +1,19 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common'
+import { ParseObjectIdPipe } from '../../../shared/http/object-id.pipe'
 import { PaginationQuery } from '../../../shared/http/pagination.query'
 import { toPageView } from '../../../shared/http/page.view'
 import { CreateDocumentTypeUseCase } from '../../application/create-document-type.usecase'
 import { ListDocumentTypesUseCase } from '../../application/list-document-types.usecase'
+import { SoftDeleteDocumentTypeUseCase } from '../../application/soft-delete-document-type.usecase'
 import { CreateDocumentTypeBody } from './dto/create-document-type.body'
 import {
   DocumentTypePageView,
@@ -14,6 +25,7 @@ export class DocumentTypesController {
   constructor(
     private readonly createDocumentType: CreateDocumentTypeUseCase,
     private readonly listDocumentTypes: ListDocumentTypesUseCase,
+    private readonly softDeleteDocumentType: SoftDeleteDocumentTypeUseCase,
   ) {}
 
   @Post()
@@ -29,5 +41,11 @@ export class DocumentTypesController {
       await this.listDocumentTypes.execute(pagination),
       pagination,
     )
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  remove(@Param('id', ParseObjectIdPipe) id: string): Promise<void> {
+    return this.softDeleteDocumentType.execute(id)
   }
 }

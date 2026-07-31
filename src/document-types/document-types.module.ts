@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { CreateDocumentTypeUseCase } from './application/create-document-type.usecase'
 import { ListDocumentTypesUseCase } from './application/list-document-types.usecase'
+import { SoftDeleteDocumentTypeUseCase } from './application/soft-delete-document-type.usecase'
 import { DOCUMENT_TYPE_REPOSITORY } from './domain/document-type.repository'
 import { DocumentTypesController } from './infra/http/document-types.controller'
 import {
@@ -20,6 +21,7 @@ import { MongoDocumentTypeRepository } from './infra/mongo/mongo-document-type.r
   providers: [
     CreateDocumentTypeUseCase,
     ListDocumentTypesUseCase,
+    SoftDeleteDocumentTypeUseCase,
     {
       provide: DOCUMENT_TYPE_REPOSITORY,
       useClass: MongoDocumentTypeRepository,
