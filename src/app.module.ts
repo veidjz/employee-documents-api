@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common'
+import { APP_FILTER } from '@nestjs/core'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { validateEnvironment } from './config/env.validation'
+import { AllExceptionsFilter } from './shared/http/all-exceptions.filter'
 import { HealthController } from './shared/http/health.controller'
 
 @Module({
@@ -18,6 +20,9 @@ import { HealthController } from './shared/http/health.controller'
     }),
   ],
   controllers: [AppController, HealthController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+  ],
 })
 export class AppModule {}
