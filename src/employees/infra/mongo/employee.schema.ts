@@ -31,3 +31,5 @@ EmployeeSchema.index(
   { email: 1 },
   { unique: true, partialFilterExpression: { deletedAt: null } },
 )
+
+EmployeeSchema.index({ deletedAt: 1, _id: -1 })

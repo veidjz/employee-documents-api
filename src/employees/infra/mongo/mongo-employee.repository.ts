@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, mongo } from 'mongoose'
 import { ConflictError } from '../../../shared/domain/domain-error'
+import { Page, Pagination } from '../../../shared/domain/page'
 import { Employee } from '../../domain/employee'
 import {
   EmployeeRepository,
@@ -29,6 +30,21 @@ export class MongoEmployeeRepository implements EmployeeRepository {
 
       throw error
     }
+  }
+
+  async list({ page, limit }: Pagination): Promise<Page<Employee>> {
+    const activeEmployees = { deletedAt: null }
+    const [documents, total] = await Promise.all([
+      this.employees
+        .find(activeEmployees)
+        .sort({ _id: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      this.employees.countDocuments(activeEmployees).exec(),
+    ])
+
+    return { data: documents.map(toEmployee), total }
   }
 }
 
