@@ -27,3 +27,5 @@ DocumentTypeSchema.index(
   { slug: 1 },
   { unique: true, partialFilterExpression: { deletedAt: null } },
 )
+
+DocumentTypeSchema.index({ deletedAt: 1, _id: -1 })

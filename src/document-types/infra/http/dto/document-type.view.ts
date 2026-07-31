@@ -1,3 +1,4 @@
+import { PageMeta } from '../../../../shared/http/page.view'
 import { DocumentType } from '../../../domain/document-type'
 
 export class DocumentTypeView implements DocumentType {
@@ -6,4 +7,9 @@ export class DocumentTypeView implements DocumentType {
   slug!: string
   description!: string | null
   createdAt!: Date
+}
+
+export class DocumentTypePageView {
+  data!: DocumentTypeView[]
+  meta!: PageMeta
 }

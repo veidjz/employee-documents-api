@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { CreateDocumentTypeUseCase } from './application/create-document-type.usecase'
+import { ListDocumentTypesUseCase } from './application/list-document-types.usecase'
 import { DOCUMENT_TYPE_REPOSITORY } from './domain/document-type.repository'
 import { DocumentTypesController } from './infra/http/document-types.controller'
 import {
@@ -18,6 +19,7 @@ import { MongoDocumentTypeRepository } from './infra/mongo/mongo-document-type.r
   controllers: [DocumentTypesController],
   providers: [
     CreateDocumentTypeUseCase,
+    ListDocumentTypesUseCase,
     {
       provide: DOCUMENT_TYPE_REPOSITORY,
       useClass: MongoDocumentTypeRepository,

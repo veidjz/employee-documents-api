@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, mongo } from 'mongoose'
 import { ConflictError } from '../../../shared/domain/domain-error'
+import { Page, Pagination } from '../../../shared/domain/page'
 import { DocumentType } from '../../domain/document-type'
 import {
   DocumentTypeRepository,
@@ -29,6 +30,21 @@ export class MongoDocumentTypeRepository implements DocumentTypeRepository {
 
       throw error
     }
+  }
+
+  async list({ page, limit }: Pagination): Promise<Page<DocumentType>> {
+    const activeDocumentTypes = { deletedAt: null }
+    const [documents, total] = await Promise.all([
+      this.documentTypes
+        .find(activeDocumentTypes)
+        .sort({ _id: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      this.documentTypes.countDocuments(activeDocumentTypes).exec(),
+    ])
+
+    return { data: documents.map(toDocumentType), total }
   }
 }
 
