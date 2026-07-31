@@ -1,3 +1,4 @@
+import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsOptional, IsString, Length, MaxLength } from 'class-validator'
 
 export class CreateDocumentTypeBody {
@@ -5,6 +6,7 @@ export class CreateDocumentTypeBody {
   @Length(2, 120)
   name!: string
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @MaxLength(500)
