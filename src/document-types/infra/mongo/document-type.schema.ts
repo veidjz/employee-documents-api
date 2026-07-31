@@ -22,3 +22,8 @@ export type DocumentTypeDocument = HydratedDocument<DocumentTypeModel>
 
 export const DocumentTypeSchema =
   SchemaFactory.createForClass(DocumentTypeModel)
+
+DocumentTypeSchema.index(
+  { slug: 1 },
+  { unique: true, partialFilterExpression: { deletedAt: null } },
+)
