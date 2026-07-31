@@ -32,4 +32,29 @@ export default tseslint.config(
       "prettier/prettier": ["error", { endOfLine: "auto" }],
     },
   },
+  {
+    files: ['src/*/domain/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { patterns: ['mongoose*', 'express*', '@nestjs/**'] },
+      ],
+    },
+  },
+  {
+    files: ['src/*/application/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            'mongoose*',
+            'express*',
+            '@nestjs/mongoose*',
+            '@nestjs/platform-*',
+          ],
+        },
+      ],
+    },
+  },
 );
