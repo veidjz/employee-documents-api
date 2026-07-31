@@ -5,6 +5,7 @@ import { Model } from 'mongoose'
 import request from 'supertest'
 import { App } from 'supertest/types'
 import { AppModule } from '../src/app.module'
+import { EmployeeView } from '../src/employees/infra/http/dto/employee.view'
 import { EmployeeModel } from '../src/employees/infra/mongo/employee.schema'
 
 const anaSouza = {
@@ -35,6 +36,76 @@ describe('Employees (e2e)', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  async function createAnaSouza(): Promise<EmployeeView> {
+    const response = await request(app.getHttpServer())
+      .post('/employees')
+      .send(anaSouza)
+      .expect(201)
+
+    return response.body as EmployeeView
+  }
+
+  it('lists employees in a pagination envelope', async () => {
+    await request(app.getHttpServer()).post('/employees').send(anaSouza)
+
+    const response = await request(app.getHttpServer())
+      .get('/employees')
+      .query({ limit: 5 })
+      .expect(200)
+
+    expect(response.body).toEqual({
+      data: [expect.objectContaining({ name: 'Ana Souza' })],
+      meta: { page: 1, limit: 5, total: 1, totalPages: 1 },
+    })
+  })
+
+  it('rejects a limit above the hard cap', async () => {
+    await request(app.getHttpServer())
+      .get('/employees')
+      .query({ limit: 101 })
+      .expect(400)
+  })
+
+  it('allows a cpf to be reused once the employee is soft deleted', async () => {
+    const { id } = await createAnaSouza()
+
+    await request(app.getHttpServer()).delete(`/employees/${id}`).expect(204)
+
+    await request(app.getHttpServer())
+      .post('/employees')
+      .send(anaSouza)
+      .expect(201)
+
+    const listed = await request(app.getHttpServer())
+      .get('/employees')
+      .expect(200)
+
+    expect(listed.body).toMatchObject({ meta: { total: 1 } })
+  })
+
+  it('answers a second delete of the same employee with not found', async () => {
+    const { id } = await createAnaSouza()
+
+    await request(app.getHttpServer()).delete(`/employees/${id}`).expect(204)
+    await request(app.getHttpServer()).delete(`/employees/${id}`).expect(404)
+  })
+
+  it('answers a missing employee with a not found problem', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/employees/000000000000000000000000')
+      .expect(404)
+
+    expect(response.body).toMatchObject({ code: 'EMPLOYEE_NOT_FOUND' })
+  })
+
+  it('answers a malformed identifier with a bad request problem', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/employees/not-an-id')
+      .expect(400)
+
+    expect(response.body).toMatchObject({ code: 'INVALID_OBJECT_ID' })
   })
 
   it('rejects a cpf already taken by an active employee', async () => {
