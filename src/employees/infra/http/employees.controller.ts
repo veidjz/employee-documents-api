@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
+import { ParseObjectIdPipe } from '../../../shared/http/object-id.pipe'
 import { PaginationQuery } from '../../../shared/http/pagination.query'
 import { toPageView } from '../../../shared/http/page.view'
 import { CreateEmployeeUseCase } from '../../application/create-employee.usecase'
+import { GetEmployeeUseCase } from '../../application/get-employee.usecase'
 import { ListEmployeesUseCase } from '../../application/list-employees.usecase'
 import { CreateEmployeeBody } from './dto/create-employee.body'
 import { EmployeePageView, EmployeeView } from './dto/employee.view'
@@ -11,6 +13,7 @@ export class EmployeesController {
   constructor(
     private readonly createEmployee: CreateEmployeeUseCase,
     private readonly listEmployees: ListEmployeesUseCase,
+    private readonly getEmployee: GetEmployeeUseCase,
   ) {}
 
   @Post()
@@ -21,5 +24,10 @@ export class EmployeesController {
   @Get()
   async list(@Query() pagination: PaginationQuery): Promise<EmployeePageView> {
     return toPageView(await this.listEmployees.execute(pagination), pagination)
+  }
+
+  @Get(':id')
+  get(@Param('id', ParseObjectIdPipe) id: string): Promise<EmployeeView> {
+    return this.getEmployee.execute(id)
   }
 }

@@ -46,6 +46,14 @@ export class MongoEmployeeRepository implements EmployeeRepository {
 
     return { data: documents.map(toEmployee), total }
   }
+
+  async findById(id: string): Promise<Employee | null> {
+    const found = await this.employees
+      .findOne({ _id: id, deletedAt: null })
+      .exec()
+
+    return found && toEmployee(found)
+  }
 }
 
 function isDuplicateKey(

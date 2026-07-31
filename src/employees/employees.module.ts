@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { CreateEmployeeUseCase } from './application/create-employee.usecase'
+import { GetEmployeeUseCase } from './application/get-employee.usecase'
 import { ListEmployeesUseCase } from './application/list-employees.usecase'
 import { EMPLOYEE_REPOSITORY } from './domain/employee.repository'
 import { EmployeesController } from './infra/http/employees.controller'
@@ -17,6 +18,7 @@ import { MongoEmployeeRepository } from './infra/mongo/mongo-employee.repository
   providers: [
     CreateEmployeeUseCase,
     ListEmployeesUseCase,
+    GetEmployeeUseCase,
     { provide: EMPLOYEE_REPOSITORY, useClass: MongoEmployeeRepository },
   ],
   exports: [MongooseModule, EMPLOYEE_REPOSITORY],
