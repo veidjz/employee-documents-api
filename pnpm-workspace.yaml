@@ -1,2 +1,3 @@
 allowBuilds:
+  mongodb-memory-server: false
   unrs-resolver: false
