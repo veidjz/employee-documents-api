@@ -15,7 +15,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp()
-    const { status, detail, code } = this.describe(exception)
+    const { status, detail, code, errors } = this.describe(exception)
 
     context
       .getResponse<Response>()
@@ -28,10 +28,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
         detail,
         instance: context.getRequest<Request>().url,
         code,
+        ...(errors && { errors }),
       })
   }
 
-  private describe(exception: unknown) {
+  private describe(exception: unknown): ProblemPayload & {
+    status: number
+    detail: string
+  } {
     if (exception instanceof DomainError) {
       return {
         status: exception.status,
@@ -42,7 +46,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       const status = exception.getStatus()
-      return { status, detail: exception.message, code: statusCode(status) }
+      const payload = exception.getResponse()
+      return {
+        status,
+        detail: exception.message,
+        ...(isProblemPayload(payload)
+          ? { code: payload.code, errors: payload.errors }
+          : { code: statusCode(status) }),
+      }
     }
 
     this.logger.error(exception)
@@ -52,6 +63,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
       code: statusCode(500),
     }
   }
+}
+
+type ProblemPayload = {
+  code: string
+  errors?: { field: string; message: string }[]
+}
+
+function isProblemPayload(payload: string | object): payload is ProblemPayload {
+  return typeof payload === 'object' && 'code' in payload
 }
 
 function reasonPhrase(status: number): string {
