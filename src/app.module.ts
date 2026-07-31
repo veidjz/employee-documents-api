@@ -3,6 +3,7 @@ import { APP_FILTER, APP_PIPE } from '@nestjs/core'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import { validateEnvironment } from './config/env.validation'
+import { EmployeesModule } from './employees/employees.module'
 import { AllExceptionsFilter } from './shared/http/all-exceptions.filter'
 import { HealthController } from './shared/http/health.controller'
 import { validationPipe } from './shared/http/validation.pipe'
@@ -17,6 +18,7 @@ import { validationPipe } from './shared/http/validation.pipe'
         serverSelectionTimeoutMS: 5000,
       }),
     }),
+    EmployeesModule,
   ],
   controllers: [HealthController],
   providers: [
