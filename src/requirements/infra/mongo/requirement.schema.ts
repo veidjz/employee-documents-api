@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument, SchemaTypes, Types } from 'mongoose'
-import type { RequirementStatus } from '../../domain/requirement'
+import {
+  REQUIREMENT_STATUSES,
+  type RequirementStatus,
+} from '../../domain/requirement'
 
 @Schema({ collection: 'requirements', timestamps: true, versionKey: false })
 export class RequirementModel {
@@ -10,7 +13,7 @@ export class RequirementModel {
   @Prop({ type: SchemaTypes.ObjectId, required: true })
   documentTypeId!: Types.ObjectId
 
-  @Prop({ type: String, enum: ['PENDING', 'SUBMITTED'], default: 'PENDING' })
+  @Prop({ type: String, enum: REQUIREMENT_STATUSES, default: 'PENDING' })
   status!: RequirementStatus
 
   @Prop({ type: Number, default: 0 })
