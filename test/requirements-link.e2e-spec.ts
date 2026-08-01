@@ -115,6 +115,26 @@ describe('Requirements link (e2e)', () => {
     await expect(requirements.countDocuments()).resolves.toBe(1)
   })
 
+  it('rejects a second unlink of the same document type', async () => {
+    const employeeId = await createEmployee()
+    const asoId = await createDocumentType('ASO')
+
+    await request(app.getHttpServer())
+      .post(`/employees/${employeeId}/requirements`)
+      .send({ documentTypeIds: [asoId] })
+      .expect(201)
+
+    await request(app.getHttpServer())
+      .delete(`/employees/${employeeId}/requirements/${asoId}`)
+      .expect(204)
+
+    const response = await request(app.getHttpServer())
+      .delete(`/employees/${employeeId}/requirements/${asoId}`)
+      .expect(404)
+
+    expect(response.body).toMatchObject({ code: 'REQUIREMENT_NOT_FOUND' })
+  })
+
   it('rejects a link to an employee that was soft deleted', async () => {
     const employeeId = await createEmployee()
     const asoId = await createDocumentType('ASO')
