@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model, mongo } from 'mongoose'
+import { Model } from 'mongoose'
 import { ConflictError } from '../../../shared/domain/domain-error'
 import { Page, Pagination } from '../../../shared/domain/page'
+import { isDuplicateKey } from '../../../shared/mongo/duplicate-key'
 import { DocumentType } from '../../domain/document-type'
 import {
   DocumentTypeRepository,
@@ -21,7 +22,7 @@ export class MongoDocumentTypeRepository implements DocumentTypeRepository {
     try {
       return toDocumentType(await this.documentTypes.create(newDocumentType))
     } catch (error) {
-      if (error instanceof mongo.MongoServerError && error.code === 11000) {
+      if (isDuplicateKey(error)) {
         throw new ConflictError(
           'DOCUMENT_TYPE_ALREADY_EXISTS',
           'Document type with this name already exists',
@@ -47,12 +48,17 @@ export class MongoDocumentTypeRepository implements DocumentTypeRepository {
     return { data: documents.map(toDocumentType), total }
   }
 
-  async softDelete(id: string): Promise<boolean> {
+  async findByIds(ids: string[]): Promise<DocumentType[]> {
+    const documents = await this.documentTypes
+      .find({ _id: { $in: ids }, deletedAt: null })
+      .exec()
+
+    return documents.map(toDocumentType)
+  }
+
+  async softDelete(id: string, deletedAt: Date): Promise<boolean> {
     const { modifiedCount } = await this.documentTypes
-      .updateOne(
-        { _id: id, deletedAt: null },
-        { $set: { deletedAt: new Date() } },
-      )
+      .updateOne({ _id: id, deletedAt: null }, { $set: { deletedAt } })
       .exec()
 
     return modifiedCount === 1

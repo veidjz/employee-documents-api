@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 import { validateEnvironment } from './config/env.validation'
 import { DocumentTypesModule } from './document-types/document-types.module'
 import { EmployeesModule } from './employees/employees.module'
+import { RequirementsModule } from './requirements/requirements.module'
 import { AllExceptionsFilter } from './shared/http/all-exceptions.filter'
 import { HealthController } from './shared/http/health.controller'
 import { validationPipe } from './shared/http/validation.pipe'
@@ -24,6 +25,7 @@ mongoose.set('transactionAsyncLocalStorage', true)
     }),
     EmployeesModule,
     DocumentTypesModule,
+    RequirementsModule,
   ],
   controllers: [HealthController],
   providers: [

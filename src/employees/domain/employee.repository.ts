@@ -9,5 +9,5 @@ export interface EmployeeRepository {
   create(newEmployee: NewEmployee): Promise<Employee>
   list(pagination: Pagination): Promise<Page<Employee>>
   findById(id: string): Promise<Employee | null>
-  softDelete(id: string): Promise<boolean>
+  softDelete(id: string, deletedAt: Date): Promise<boolean>
 }
