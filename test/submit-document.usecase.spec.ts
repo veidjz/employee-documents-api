@@ -27,6 +27,10 @@ class CountingSubmissionRepository implements SubmissionRepository {
   softDeleteByRequirements(): Promise<void> {
     return Promise.reject(new Error('Unexpected requirement cascade'))
   }
+
+  reviveByRequirements(): Promise<void> {
+    return Promise.reject(new Error('Unexpected revive'))
+  }
 }
 
 class MissingRequirementRepository implements RequirementRepository {

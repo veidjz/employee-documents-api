@@ -60,6 +60,15 @@ export class MongoSubmissionRepository implements SubmissionRepository {
       )
       .exec()
   }
+
+  async reviveByRequirements(requirementIds: string[]): Promise<void> {
+    await this.submissions
+      .updateMany(
+        { requirementId: { $in: requirementIds }, deletedAt: { $ne: null } },
+        { $set: { deletedAt: null } },
+      )
+      .exec()
+  }
 }
 
 function toSubmission(document: SubmissionDocument): Submission {

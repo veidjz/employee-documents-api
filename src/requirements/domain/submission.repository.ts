@@ -16,4 +16,5 @@ export interface SubmissionRepository {
     requirementIds: string[],
     deletedAt: Date,
   ): Promise<void>
+  reviveByRequirements(requirementIds: string[]): Promise<void>
 }
