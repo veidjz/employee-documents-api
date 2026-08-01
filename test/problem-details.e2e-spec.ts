@@ -37,4 +37,23 @@ describe('Problem details (e2e)', () => {
       code: 'NOT_FOUND',
     })
   })
+
+  it('correlates the error response with a generated request id', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/unknown-route')
+      .expect(404)
+
+    expect(response.headers['x-request-id']).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+    )
+  })
+
+  it('keeps the request id sent by the caller', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/unknown-route')
+      .set('x-request-id', 'caller-provided-id')
+      .expect(404)
+
+    expect(response.headers['x-request-id']).toBe('caller-provided-id')
+  })
 })
