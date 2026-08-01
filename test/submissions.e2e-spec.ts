@@ -8,7 +8,10 @@ import { AppModule } from '../src/app.module'
 import { DocumentTypeModel } from '../src/document-types/infra/mongo/document-type.schema'
 import { EmployeeModel } from '../src/employees/infra/mongo/employee.schema'
 import { RequirementListView } from '../src/requirements/infra/http/dto/requirement.view'
-import { SubmissionView } from '../src/requirements/infra/http/dto/submission.view'
+import {
+  SubmissionPageView,
+  SubmissionView,
+} from '../src/requirements/infra/http/dto/submission.view'
 import { RequirementModel } from '../src/requirements/infra/mongo/requirement.schema'
 import { SubmissionModel } from '../src/requirements/infra/mongo/submission.schema'
 
@@ -119,5 +122,24 @@ describe('Submissions (e2e)', () => {
     expect(requirement.status).toBe('SUBMITTED')
     expect(requirement.currentVersion).toBe(2)
     expect(requirement.lastSubmittedAt).toEqual(stored[1].submittedAt)
+  })
+
+  it('paginates the history from the newest version', async () => {
+    const requirementId = await linkRequirement()
+
+    for (const fileName of ['first.pdf', 'second.pdf', 'third.pdf']) {
+      await submit(requirementId, fileName)
+    }
+
+    const response = await request(app.getHttpServer())
+      .get(`/requirements/${requirementId}/submissions`)
+      .query({ limit: 2 })
+      .expect(200)
+
+    const { data, meta } = response.body as SubmissionPageView
+
+    expect(data.map((submission) => submission.version)).toEqual([3, 2])
+    expect(data[0].fileName).toBe('third.pdf')
+    expect(meta).toEqual({ page: 1, limit: 2, total: 3, totalPages: 2 })
   })
 })
