@@ -1,7 +1,7 @@
-import { RequirementTotals } from './overview'
+import { RequirementAggregates } from './overview'
 
 export const STATS_REPOSITORY = Symbol('STATS_REPOSITORY')
 
 export interface StatsRepository {
-  aggregateRequirementTotals(): Promise<RequirementTotals>
+  aggregateRequirements(): Promise<RequirementAggregates>
 }

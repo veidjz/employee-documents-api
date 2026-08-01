@@ -13,13 +13,20 @@ export class GetOverviewUseCase {
   ) {}
 
   async execute(): Promise<Overview> {
-    const requirements = await this.stats.aggregateRequirementTotals()
+    const { totals, compliance } = await this.stats.aggregateRequirements()
 
     return {
       generatedAt: new Date(),
       requirements: {
-        ...requirements,
-        completionRate: rate(requirements.submitted, requirements.total),
+        ...totals,
+        completionRate: rate(totals.submitted, totals.total),
+      },
+      employees: {
+        ...compliance,
+        complianceRate: rate(
+          compliance.fullyCompliant,
+          compliance.withRequirements,
+        ),
       },
     }
   }

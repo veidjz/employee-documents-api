@@ -7,7 +7,14 @@ export class RequirementTotalsView {
   completionRate!: number | null
 }
 
+export class EmployeeComplianceView {
+  withRequirements!: number
+  fullyCompliant!: number
+  complianceRate!: number | null
+}
+
 export class OverviewView implements Overview {
   generatedAt!: Date
   requirements!: RequirementTotalsView
+  employees!: EmployeeComplianceView
 }
