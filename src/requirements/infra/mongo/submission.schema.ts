@@ -44,3 +44,5 @@ SubmissionSchema.index(
   { requirementId: 1 },
   { unique: true, partialFilterExpression: { isActive: true } },
 )
+
+SubmissionSchema.index({ deletedAt: 1, submittedAt: -1, _id: -1 })
