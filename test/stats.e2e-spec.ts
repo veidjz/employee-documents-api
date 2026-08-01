@@ -169,6 +169,41 @@ describe('Stats overview (e2e)', () => {
     ])
   })
 
+  it('lists the newest submissions first with hydrated names', async () => {
+    const anaId = await createEmployee('Ana Souza', '52998224725')
+    const brunoId = await createEmployee('Bruno Lima', '11144477735')
+    const asoId = await createDocumentType('ASO')
+
+    const [anaAso] = await link(anaId, [asoId])
+    const [brunoAso] = await link(brunoId, [asoId])
+
+    await submit(anaAso.id)
+    await submit(brunoAso.id)
+    await submit(anaAso.id)
+
+    const { latestSubmissions } = await overview()
+    const [newest] = latestSubmissions
+
+    expect(newest).toEqual({
+      id: newest.id,
+      submittedAt: newest.submittedAt,
+      requirementId: anaAso.id,
+      version: 2,
+      employee: { id: anaId, name: 'Ana Souza' },
+      documentType: { id: asoId, name: 'ASO' },
+    })
+    expect(
+      latestSubmissions.map(({ requirementId, version }) => [
+        requirementId,
+        version,
+      ]),
+    ).toEqual([
+      [anaAso.id, 2],
+      [brunoAso.id, 1],
+      [anaAso.id, 1],
+    ])
+  })
+
   it('reports a null completion rate when there is no requirement', async () => {
     const { requirements: totals, employees } = await overview()
 
