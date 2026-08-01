@@ -7,14 +7,20 @@ import { App } from 'supertest/types'
 import { AppModule } from '../src/app.module'
 import { DocumentTypeModel } from '../src/document-types/infra/mongo/document-type.schema'
 import { EmployeeModel } from '../src/employees/infra/mongo/employee.schema'
-import { RequirementPageView } from '../src/requirements/infra/http/dto/requirement.view'
+import {
+  RequirementListView,
+  RequirementPageView,
+  RequirementView,
+} from '../src/requirements/infra/http/dto/requirement.view'
 import { RequirementModel } from '../src/requirements/infra/mongo/requirement.schema'
+import { SubmissionModel } from '../src/requirements/infra/mongo/submission.schema'
 
 describe('Requirements listing (e2e)', () => {
   let app: INestApplication<App>
   let employees: Model<EmployeeModel>
   let documentTypes: Model<DocumentTypeModel>
   let requirements: Model<RequirementModel>
+  let submissions: Model<SubmissionModel>
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
@@ -31,16 +37,21 @@ describe('Requirements listing (e2e)', () => {
     requirements = app.get<Model<RequirementModel>>(
       getModelToken(RequirementModel.name),
     )
+    submissions = app.get<Model<SubmissionModel>>(
+      getModelToken(SubmissionModel.name),
+    )
 
     await employees.syncIndexes()
     await documentTypes.syncIndexes()
     await requirements.syncIndexes()
+    await submissions.syncIndexes()
   })
 
   beforeEach(async () => {
     await employees.deleteMany({})
     await documentTypes.deleteMany({})
     await requirements.deleteMany({})
+    await submissions.deleteMany({})
   })
 
   afterAll(async () => {
@@ -72,11 +83,13 @@ describe('Requirements listing (e2e)', () => {
   async function link(
     employeeId: string,
     documentTypeIds: string[],
-  ): Promise<void> {
-    await request(app.getHttpServer())
+  ): Promise<RequirementView[]> {
+    const linked = await request(app.getHttpServer())
       .post(`/employees/${employeeId}/requirements`)
       .send({ documentTypeIds })
       .expect(201)
+
+    return (linked.body as RequirementListView).data
   }
 
   it('hydrates the employee and the document type of every requirement', async () => {
@@ -98,5 +111,46 @@ describe('Requirements listing (e2e)', () => {
       documentType: { id: asoId, name: 'ASO', slug: 'aso' },
     })
     expect(data[0].employee).toEqual({ id: employeeId, name: 'Ana Souza' })
+  })
+
+  it('combines the filters and leaves out soft deleted requirements', async () => {
+    const anaId = await createEmployee('Ana Souza', '52998224725')
+    const brunoId = await createEmployee('Bruno Lima', '11144477735')
+    const asoId = await createDocumentType('ASO')
+    const cnhId = await createDocumentType('CNH')
+    const rgId = await createDocumentType('RG')
+
+    const [anaAso] = await link(anaId, [asoId, cnhId, rgId])
+    await link(brunoId, [cnhId])
+
+    await request(app.getHttpServer())
+      .post(`/requirements/${anaAso.id}/submissions`)
+      .send({
+        fileName: 'aso-ana.pdf',
+        contentType: 'application/pdf',
+        sizeBytes: 184320,
+      })
+      .expect(201)
+
+    await request(app.getHttpServer())
+      .delete(`/employees/${anaId}/requirements/${rgId}`)
+      .expect(204)
+
+    const pendingForAna = await request(app.getHttpServer())
+      .get('/requirements')
+      .query({ status: 'PENDING', employeeId: anaId })
+      .expect(200)
+
+    const { data, meta } = pendingForAna.body as RequirementPageView
+
+    expect(meta.total).toBe(1)
+    expect(data[0].documentType.slug).toBe('cnh')
+
+    const byDocumentType = await request(app.getHttpServer())
+      .get('/requirements')
+      .query({ documentTypeId: cnhId })
+      .expect(200)
+
+    expect((byDocumentType.body as RequirementPageView).meta.total).toBe(2)
   })
 })
