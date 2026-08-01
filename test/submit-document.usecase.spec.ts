@@ -24,6 +24,10 @@ class CountingSubmissionRepository implements SubmissionRepository {
     return Promise.reject(new Error('Unexpected history read'))
   }
 
+  listLatest(): Promise<Submission[]> {
+    return Promise.reject(new Error('Unexpected latest submissions read'))
+  }
+
   softDeleteByRequirements(): Promise<void> {
     return Promise.reject(new Error('Unexpected requirement cascade'))
   }

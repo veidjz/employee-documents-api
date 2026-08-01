@@ -1,4 +1,6 @@
 import { DocumentType } from '../../document-types/domain/document-type'
+import { Employee } from '../../employees/domain/employee'
+import { Submission } from '../../requirements/domain/submission'
 
 export type RequirementTotals = {
   total: number
@@ -27,9 +29,18 @@ export type TopPendingDocumentType = Pick<
   'id' | 'name' | 'slug'
 > & { pendingCount: number }
 
+export type LatestSubmission = Pick<
+  Submission,
+  'id' | 'requirementId' | 'version' | 'submittedAt'
+> & {
+  employee: Pick<Employee, 'id' | 'name'>
+  documentType: Pick<DocumentType, 'id' | 'name'>
+}
+
 export type Overview = {
   generatedAt: Date
   requirements: RequirementTotals & { completionRate: number | null }
   employees: EmployeeCompliance & { complianceRate: number | null }
   topPendingDocumentTypes: TopPendingDocumentType[]
+  latestSubmissions: LatestSubmission[]
 }

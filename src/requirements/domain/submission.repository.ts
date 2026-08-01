@@ -12,6 +12,7 @@ export interface SubmissionRepository {
     requirementId: string,
     pagination: Pagination,
   ): Promise<Page<Submission>>
+  listLatest(limit: number): Promise<Submission[]>
   softDeleteByRequirements(
     requirementIds: string[],
     deletedAt: Date,
