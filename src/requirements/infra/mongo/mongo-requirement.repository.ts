@@ -49,6 +49,14 @@ export class MongoRequirementRepository implements RequirementRepository {
     return modifiedCount === 1
   }
 
+  async findById(id: string): Promise<Requirement | null> {
+    const found = await this.requirements
+      .findOne({ _id: id, deletedAt: null })
+      .exec()
+
+    return found && toRequirement(found)
+  }
+
   async reserveNextVersion(
     id: string,
     submittedAt: Date,

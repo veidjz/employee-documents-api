@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
+import { Page, Pagination } from '../../../shared/domain/page'
 import { Submission } from '../../domain/submission'
 import {
   NewSubmission,
@@ -28,6 +29,24 @@ export class MongoSubmissionRepository implements SubmissionRepository {
         { $set: { isActive: false } },
       )
       .exec()
+  }
+
+  async listByRequirement(
+    requirementId: string,
+    { page, limit }: Pagination,
+  ): Promise<Page<Submission>> {
+    const requirementSubmissions = { requirementId, deletedAt: null }
+    const [documents, total] = await Promise.all([
+      this.submissions
+        .find(requirementSubmissions)
+        .sort({ version: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      this.submissions.countDocuments(requirementSubmissions).exec(),
+    ])
+
+    return { data: documents.map(toSubmission), total }
   }
 }
 

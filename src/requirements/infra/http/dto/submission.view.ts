@@ -1,3 +1,4 @@
+import { PageMeta } from '../../../../shared/http/page.view'
 import { Submission } from '../../../domain/submission'
 
 export class SubmissionView implements Omit<
@@ -12,6 +13,11 @@ export class SubmissionView implements Omit<
   contentType!: string
   sizeBytes!: number
   submittedAt!: Date
+}
+
+export class SubmissionPageView {
+  data!: SubmissionView[]
+  meta!: PageMeta
 }
 
 export function toSubmissionView(submission: Submission): SubmissionView {
