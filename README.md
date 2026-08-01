@@ -112,3 +112,20 @@ São três mecanismos com três papéis, e nenhum substitui o outro:
 **`readConcern: snapshot` e `writeConcern: majority`.** Snapshot é o que dá à transação uma visão consistente do banco no instante em que ela começou, que é o pressuposto de ler `currentVersion` e incrementar sem enxergar escrita de concorrente no meio. Maioria é o que garante que o commit sobreviveu à confirmação de quórum antes de a API responder 201. Num replica set de um nó a maioria é barata, mas o código não fica dependendo de o cluster ter um nó só.
 
 Cada um desses mecanismos tem um teste que reprova quando ele é desligado, e não apenas um teste de caminho feliz que passaria sem eles.
+
+## Logs e rastreio
+
+Todo log sai em JSON, uma linha por evento, para `stdout`. A aplicação não escreve arquivo nem rotaciona nada: quem coleta é a plataforma.
+
+Toda resposta carrega `x-request-id`. Se a requisição já vier com esse cabeçalho, o valor é reaproveitado, o que permite correlacionar com um gateway ou balanceador na frente; se não vier, um `randomUUID` é gerado. O mesmo identificador aparece em toda linha emitida durante aquela requisição, inclusive na do tratador global de exceções, que não conhece o identificador e não precisa recebê-lo por parâmetro. Um cliente reporta um erro, entrega o `x-request-id` que recebeu, e o stack trace é achável por ele:
+
+```
+{"level":50,"req":{"id":"07cbf0b6-...","url":"/health"},"context":"AllExceptionsFilter","err":{...}}
+{"level":30,"req":{"id":"07cbf0b6-...","url":"/health"},"res":{"statusCode":500}}
+```
+
+Isso é o que a dependência compra. JSON sozinho não exigiria dependência nenhuma, porque o Nest tem `ConsoleLogger({ json: true })` nativo; o que ele não faz é propagar contexto, e cada logger emitiria sua linha sem saber a qual requisição pertence.
+
+**A requisição é logada por lista de permissão, não de proibição.** O serializer reduz a requisição a `id`, `method` e `url` e a resposta a `statusCode`. Ficam de fora o corpo, a query, os parâmetros de rota, os cabeçalhos de entrada, o endereço remoto e o dump inteiro dos cabeçalhos de resposta. A garantia é estrutural: um campo acrescentado depois não vaza por esquecimento, porque o que não está no serializer não é logado. Efeito colateral medido na linha de acesso: 618 para 236 bytes.
+
+Em desenvolvimento, `pnpm start:dev | npx pino-pretty` deixa a saída legível sem que o formatador entre como dependência do projeto.
