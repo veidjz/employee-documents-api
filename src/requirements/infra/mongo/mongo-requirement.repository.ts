@@ -57,6 +57,15 @@ export class MongoRequirementRepository implements RequirementRepository {
       .updateMany({ employeeId, deletedAt: null }, { $set: { deletedAt } })
       .exec()
   }
+
+  async softDeleteByDocumentType(
+    documentTypeId: string,
+    deletedAt: Date,
+  ): Promise<void> {
+    await this.requirements
+      .updateMany({ documentTypeId, deletedAt: null }, { $set: { deletedAt } })
+      .exec()
+  }
 }
 
 function toRequirement(document: RequirementDocument): Requirement {

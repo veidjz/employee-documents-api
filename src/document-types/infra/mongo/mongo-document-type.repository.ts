@@ -56,12 +56,9 @@ export class MongoDocumentTypeRepository implements DocumentTypeRepository {
     return documents.map(toDocumentType)
   }
 
-  async softDelete(id: string): Promise<boolean> {
+  async softDelete(id: string, deletedAt: Date): Promise<boolean> {
     const { modifiedCount } = await this.documentTypes
-      .updateOne(
-        { _id: id, deletedAt: null },
-        { $set: { deletedAt: new Date() } },
-      )
+      .updateOne({ _id: id, deletedAt: null }, { $set: { deletedAt } })
       .exec()
 
     return modifiedCount === 1

@@ -3,6 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { CreateDocumentTypeUseCase } from './application/create-document-type.usecase'
 import { ListDocumentTypesUseCase } from './application/list-document-types.usecase'
 import { SoftDeleteDocumentTypeUseCase } from './application/soft-delete-document-type.usecase'
+import { RequirementPersistenceModule } from '../requirements/requirement-persistence.module'
+import { TransactionModule } from '../shared/mongo/transaction.module'
 import { DOCUMENT_TYPE_REPOSITORY } from './domain/document-type.repository'
 import { DocumentTypesController } from './infra/http/document-types.controller'
 import {
@@ -16,6 +18,8 @@ import { MongoDocumentTypeRepository } from './infra/mongo/mongo-document-type.r
     MongooseModule.forFeature([
       { name: DocumentTypeModel.name, schema: DocumentTypeSchema },
     ]),
+    RequirementPersistenceModule,
+    TransactionModule,
   ],
   controllers: [DocumentTypesController],
   providers: [

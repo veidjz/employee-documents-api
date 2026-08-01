@@ -6,4 +6,8 @@ export interface RequirementRepository {
   link(employeeId: string, documentTypeId: string): Promise<Requirement>
   unlink(employeeId: string, documentTypeId: string): Promise<boolean>
   softDeleteByEmployee(employeeId: string, deletedAt: Date): Promise<void>
+  softDeleteByDocumentType(
+    documentTypeId: string,
+    deletedAt: Date,
+  ): Promise<void>
 }
