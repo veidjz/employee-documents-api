@@ -88,3 +88,27 @@ Em `submissions`, o índice dos últimos envios foi medido com 50 mil documentos
 | Com `{deletedAt: 1, submittedAt: -1, _id: -1}` | `LIMIT <- FETCH <- IXSCAN` | 10 | 10 | 0ms |
 
 A paginação é por `skip` e `limit`, e o custo cresce com a profundidade: a página 50 examina 1000 documentos para devolver 20. Serve porque a interface é de navegação por página e `limit` tem teto de 100. A alternativa é cursor por `_id`, constante em qualquer profundidade, que não permite saltar para uma página arbitrária nem informar `totalPages`.
+
+## Concorrência
+
+**O que acontece com dois reenvios simultâneos do mesmo documento.** Os dois abrem transação e os dois tentam `$inc` no mesmo documento do vínculo. O primeiro pega o lock, o segundo espera até `maxTransactionLockRequestTimeoutMillis` e recebe `WriteConflict`, que carrega o label `TransientTransactionError`. O `withTransaction` do driver retenta a transação inteira com um snapshot novo, e a retentativa lê a versão já incrementada. O resultado é determinístico: versões consecutivas, exatamente uma ativa, e nenhuma linha de retry escrita à mão. O teste com três reenvios simultâneos produz as versões 1, 2 e 3 sem buraco.
+
+São três mecanismos com três papéis, e nenhum substitui o outro:
+
+| Mecanismo | Garante | Não garante |
+|---|---|---|
+| `connection.transaction()` | As escritas de uma operação acontecem juntas ou nenhuma acontece | Unicidade: duas transações que inserem documentos diferentes não conflitam e ambas commitam |
+| `$inc` no documento do vínculo | Serialização: dois reenvios do mesmo vínculo colidem no lock e o segundo retenta com estado novo | Nada contra escrita que não passe pelo caso de uso |
+| Índice único parcial `{requirementId}` onde `isActive: true` | A invariante de uma versão ativa por vínculo, válida até para um script rodado no `mongosh` | Que as escritas relacionadas aconteçam juntas |
+
+**Por que `$inc` e não `count() + 1`.** `count() + 1` lê fora de qualquer garantia de exclusão: dois reenvios leem o mesmo número e escrevem a mesma versão. O `$inc` é a reserva e o lock ao mesmo tempo, num documento que já existe e que já é o dono da numeração. Por acontecer dentro da transação, uma falha nas escritas seguintes devolve o contador ao valor anterior, o que é o que impede buraco na numeração.
+
+**Por que a versão anterior é desativada antes de a nova ser inserida.** O índice único parcial não admite duas ativas nem por um instante dentro da mesma transação. Inserir primeiro e desativar depois dispara `E11000` na inserção.
+
+**Como a sessão chega aos repositórios.** Por `mongoose.set('transactionAsyncLocalStorage', true)`, ligado na raiz de composição. Nenhum repositório menciona sessão: eles fazem `create` e `updateOne` normais e mesmo assim participam da fronteira. Os casos de uso recebem uma porta `TransactionRunner`, e a regra de lint que proíbe `mongoose` em `application/` garante que nenhum deles consiga injetar `Connection` ou receber `ClientSession` por fora.
+
+**Uma fronteira transacional por operação.** Com o AsyncLocalStorage ligado, cada `connection.transaction()` cria a própria sessão, e uma transação aninhada não é revertida quando a externa falha. A consequência virou regra de projeto: nenhum caso de uso transacional chama outro caso de uso transacional. A cascata de remoção orquestra repositórios dentro de uma fronteira só.
+
+**`readConcern: snapshot` e `writeConcern: majority`.** Snapshot é o que dá à transação uma visão consistente do banco no instante em que ela começou, que é o pressuposto de ler `currentVersion` e incrementar sem enxergar escrita de concorrente no meio. Maioria é o que garante que o commit sobreviveu à confirmação de quórum antes de a API responder 201. Num replica set de um nó a maioria é barata, mas o código não fica dependendo de o cluster ter um nó só.
+
+Cada um desses mecanismos tem um teste que reprova quando ele é desligado, e não apenas um teste de caminho feliz que passaria sem eles.
