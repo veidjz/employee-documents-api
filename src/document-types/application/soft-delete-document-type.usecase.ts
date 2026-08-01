@@ -3,6 +3,10 @@ import {
   REQUIREMENT_REPOSITORY,
   type RequirementRepository,
 } from '../../requirements/domain/requirement.repository'
+import {
+  SUBMISSION_REPOSITORY,
+  type SubmissionRepository,
+} from '../../requirements/domain/submission.repository'
 import { NotFoundError } from '../../shared/domain/domain-error'
 import {
   TRANSACTION_RUNNER,
@@ -20,6 +24,8 @@ export class SoftDeleteDocumentTypeUseCase {
     private readonly documentTypes: DocumentTypeRepository,
     @Inject(REQUIREMENT_REPOSITORY)
     private readonly requirements: RequirementRepository,
+    @Inject(SUBMISSION_REPOSITORY)
+    private readonly submissions: SubmissionRepository,
     @Inject(TRANSACTION_RUNNER)
     private readonly transaction: TransactionRunner,
   ) {}
@@ -37,7 +43,12 @@ export class SoftDeleteDocumentTypeUseCase {
         )
       }
 
-      await this.requirements.softDeleteByDocumentType(id, deletedAt)
+      const requirementIds = await this.requirements.softDeleteByDocumentType(
+        id,
+        deletedAt,
+      )
+
+      await this.submissions.softDeleteByRequirements(requirementIds, deletedAt)
     })
   }
 }

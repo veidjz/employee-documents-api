@@ -46,11 +46,11 @@ class MissingRequirementRepository implements RequirementRepository {
     return Promise.reject(new Error('Unexpected unlink'))
   }
 
-  softDeleteByEmployee(): Promise<void> {
+  softDeleteByEmployee(): Promise<string[]> {
     return Promise.reject(new Error('Unexpected employee cascade'))
   }
 
-  softDeleteByDocumentType(): Promise<void> {
+  softDeleteByDocumentType(): Promise<string[]> {
     return Promise.reject(new Error('Unexpected document type cascade'))
   }
 }

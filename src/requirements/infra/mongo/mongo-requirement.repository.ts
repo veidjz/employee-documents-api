@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { QueryFilter, Model } from 'mongoose'
 import { ConflictError } from '../../../shared/domain/domain-error'
 import { isDuplicateKey } from '../../../shared/mongo/duplicate-key'
 import { Requirement } from '../../domain/requirement'
@@ -79,22 +79,29 @@ export class MongoRequirementRepository implements RequirementRepository {
     return reserved && toRequirement(reserved)
   }
 
-  async softDeleteByEmployee(
-    employeeId: string,
-    deletedAt: Date,
-  ): Promise<void> {
-    await this.requirements
-      .updateMany({ employeeId, deletedAt: null }, { $set: { deletedAt } })
-      .exec()
+  softDeleteByEmployee(employeeId: string, deletedAt: Date): Promise<string[]> {
+    return this.softDeleteActive({ employeeId, deletedAt: null }, deletedAt)
   }
 
-  async softDeleteByDocumentType(
+  softDeleteByDocumentType(
     documentTypeId: string,
     deletedAt: Date,
-  ): Promise<void> {
+  ): Promise<string[]> {
+    return this.softDeleteActive({ documentTypeId, deletedAt: null }, deletedAt)
+  }
+
+  private async softDeleteActive(
+    active: QueryFilter<RequirementModel>,
+    deletedAt: Date,
+  ): Promise<string[]> {
+    const affected = await this.requirements.find(active).select('_id').exec()
+    const ids = affected.map((requirement) => requirement._id)
+
     await this.requirements
-      .updateMany({ documentTypeId, deletedAt: null }, { $set: { deletedAt } })
+      .updateMany({ _id: { $in: ids } }, { $set: { deletedAt } })
       .exec()
+
+    return ids.map((id) => id.toString())
   }
 }
 

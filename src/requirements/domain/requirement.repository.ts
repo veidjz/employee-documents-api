@@ -11,9 +11,9 @@ export interface RequirementRepository {
   ): Promise<string | null>
   findById(id: string): Promise<Requirement | null>
   reserveNextVersion(id: string, submittedAt: Date): Promise<Requirement | null>
-  softDeleteByEmployee(employeeId: string, deletedAt: Date): Promise<void>
+  softDeleteByEmployee(employeeId: string, deletedAt: Date): Promise<string[]>
   softDeleteByDocumentType(
     documentTypeId: string,
     deletedAt: Date,
-  ): Promise<void>
+  ): Promise<string[]>
 }
