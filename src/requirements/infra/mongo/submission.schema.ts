@@ -39,3 +39,8 @@ export type SubmissionDocument = HydratedDocument<SubmissionModel>
 export const SubmissionSchema = SchemaFactory.createForClass(SubmissionModel)
 
 SubmissionSchema.index({ requirementId: 1, version: 1 }, { unique: true })
+
+SubmissionSchema.index(
+  { requirementId: 1 },
+  { unique: true, partialFilterExpression: { isActive: true } },
+)
