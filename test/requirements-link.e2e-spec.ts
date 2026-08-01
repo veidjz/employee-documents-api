@@ -94,6 +94,27 @@ describe('Requirements link (e2e)', () => {
     })
   })
 
+  it('aborts the whole batch when the last document type is already linked', async () => {
+    const employeeId = await createEmployee()
+    const asoId = await createDocumentType('ASO')
+    const cnhId = await createDocumentType('CNH')
+
+    await request(app.getHttpServer())
+      .post(`/employees/${employeeId}/requirements`)
+      .send({ documentTypeIds: [asoId] })
+      .expect(201)
+
+    const response = await request(app.getHttpServer())
+      .post(`/employees/${employeeId}/requirements`)
+      .send({ documentTypeIds: [cnhId, asoId] })
+      .expect(409)
+
+    expect(response.body).toMatchObject({
+      code: 'REQUIREMENT_ALREADY_LINKED',
+    })
+    await expect(requirements.countDocuments()).resolves.toBe(1)
+  })
+
   it('rejects a link to an employee that was soft deleted', async () => {
     const employeeId = await createEmployee()
     const asoId = await createDocumentType('ASO')
