@@ -74,6 +74,13 @@ describe('Transaction boundary (e2e)', () => {
     })
   }
 
+  it('commits every write when the operation succeeds', async () => {
+    await transactionRunner.run(writeThroughBothRepositories)
+
+    await expect(employees.countDocuments()).resolves.toBe(1)
+    await expect(documentTypes.countDocuments()).resolves.toBe(1)
+  })
+
   it('discards every write when the operation throws', async () => {
     await expect(
       transactionRunner.run(async () => {
