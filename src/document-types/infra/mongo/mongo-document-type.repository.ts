@@ -47,6 +47,14 @@ export class MongoDocumentTypeRepository implements DocumentTypeRepository {
     return { data: documents.map(toDocumentType), total }
   }
 
+  async findByIds(ids: string[]): Promise<DocumentType[]> {
+    const documents = await this.documentTypes
+      .find({ _id: { $in: ids }, deletedAt: null })
+      .exec()
+
+    return documents.map(toDocumentType)
+  }
+
   async softDelete(id: string): Promise<boolean> {
     const { modifiedCount } = await this.documentTypes
       .updateOne(

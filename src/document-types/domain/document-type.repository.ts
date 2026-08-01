@@ -8,5 +8,6 @@ export type NewDocumentType = Omit<DocumentType, 'id' | 'createdAt'>
 export interface DocumentTypeRepository {
   create(newDocumentType: NewDocumentType): Promise<DocumentType>
   list(pagination: Pagination): Promise<Page<DocumentType>>
+  findByIds(ids: string[]): Promise<DocumentType[]>
   softDelete(id: string): Promise<boolean>
 }
