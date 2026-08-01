@@ -1,8 +1,10 @@
+import { randomUUID } from 'node:crypto'
 import { Module } from '@nestjs/common'
 import { APP_FILTER, APP_PIPE } from '@nestjs/core'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import mongoose from 'mongoose'
+import { LoggerModule } from 'nestjs-pino'
 import { validateEnvironment } from './config/env.validation'
 import { DocumentTypesModule } from './document-types/document-types.module'
 import { EmployeesModule } from './employees/employees.module'
@@ -16,6 +18,20 @@ mongoose.set('transactionAsyncLocalStorage', true)
 
 @Module({
   imports: [
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env.NODE_ENV === 'test' ? 'silent' : 'info',
+        genReqId: (request, response) => {
+          const incomingRequestId = request.headers['x-request-id']
+          const requestId =
+            typeof incomingRequestId === 'string'
+              ? incomingRequestId
+              : randomUUID()
+          response.setHeader('x-request-id', requestId)
+          return requestId
+        },
+      },
+    }),
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnvironment }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
