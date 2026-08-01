@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
+import { ConflictError } from '../../../shared/domain/domain-error'
+import { isDuplicateKey } from '../../../shared/mongo/duplicate-key'
 import { Requirement } from '../../domain/requirement'
 import { RequirementRepository } from '../../domain/requirement.repository'
 import { RequirementDocument, RequirementModel } from './requirement.schema'
@@ -13,9 +15,20 @@ export class MongoRequirementRepository implements RequirementRepository {
   ) {}
 
   async link(employeeId: string, documentTypeId: string): Promise<Requirement> {
-    return toRequirement(
-      await this.requirements.create({ employeeId, documentTypeId }),
-    )
+    try {
+      return toRequirement(
+        await this.requirements.create({ employeeId, documentTypeId }),
+      )
+    } catch (error) {
+      if (isDuplicateKey(error)) {
+        throw new ConflictError(
+          'REQUIREMENT_ALREADY_LINKED',
+          'Document type is already linked to this employee',
+        )
+      }
+
+      throw error
+    }
   }
 }
 
