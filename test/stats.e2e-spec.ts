@@ -204,6 +204,48 @@ describe('Stats overview (e2e)', () => {
     ])
   })
 
+  it('leaves soft deleted records out of every statistic', async () => {
+    const anaId = await createEmployee('Ana Souza', '52998224725')
+    const brunoId = await createEmployee('Bruno Lima', '11144477735')
+    const asoId = await createDocumentType('ASO')
+    const cnhId = await createDocumentType('CNH')
+
+    const [anaAso] = await link(anaId, [asoId, cnhId])
+    const [brunoAso] = await link(brunoId, [asoId])
+
+    await submit(anaAso.id)
+    await submit(brunoAso.id)
+
+    await request(app.getHttpServer())
+      .delete(`/employees/${brunoId}`)
+      .expect(204)
+
+    const {
+      requirements: totals,
+      employees,
+      topPendingDocumentTypes,
+      latestSubmissions,
+    } = await overview()
+
+    expect(totals).toEqual({
+      total: 2,
+      submitted: 1,
+      pending: 1,
+      completionRate: 0.5,
+    })
+    expect(employees).toEqual({
+      withRequirements: 1,
+      fullyCompliant: 0,
+      complianceRate: 0,
+    })
+    expect(topPendingDocumentTypes).toEqual([
+      { id: cnhId, name: 'CNH', slug: 'cnh', pendingCount: 1 },
+    ])
+    expect(latestSubmissions.map(({ requirementId }) => requirementId)).toEqual(
+      [anaAso.id],
+    )
+  })
+
   it('reports a null completion rate when there is no requirement', async () => {
     const { requirements: totals, employees } = await overview()
 
