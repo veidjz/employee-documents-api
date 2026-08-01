@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { IncomingMessage, ServerResponse } from 'node:http'
 import { Module } from '@nestjs/common'
 import { APP_FILTER, APP_PIPE } from '@nestjs/core'
 import { ConfigModule, ConfigService } from '@nestjs/config'
@@ -29,6 +30,14 @@ mongoose.set('transactionAsyncLocalStorage', true)
               : randomUUID()
           response.setHeader('x-request-id', requestId)
           return requestId
+        },
+        serializers: {
+          req: ({ id, method, url }: IncomingMessage & { id: string }) => ({
+            id,
+            method,
+            url,
+          }),
+          res: ({ statusCode }: ServerResponse) => ({ statusCode }),
         },
       },
     }),
