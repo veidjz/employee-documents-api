@@ -47,6 +47,21 @@ describe('Employees (e2e)', () => {
     return response.body as EmployeeView
   }
 
+  it('serves the created employee on the url from the location header', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/employees')
+      .send(anaSouza)
+      .expect(201)
+
+    const location = created.headers.location
+
+    expect(location).toBe(`/employees/${(created.body as EmployeeView).id}`)
+
+    const found = await request(app.getHttpServer()).get(location).expect(200)
+
+    expect(found.body).toEqual(created.body)
+  })
+
   it('lists employees in a pagination envelope', async () => {
     await request(app.getHttpServer()).post('/employees').send(anaSouza)
 
