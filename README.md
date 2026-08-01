@@ -6,7 +6,7 @@ API REST para o fluxo de documentação obrigatória de colaboradores. Cada cola
 
 - Cadastro de colaboradores
 - Cadastro de tipos de documento
-- Vínculo e desvínculo entre colaborador e tipo de documento
+- Vinculação e desvinculação entre colaborador e tipo de documento
 - Envio de documento como registro lógico, com histórico de versões e uma única versão ativa
 - Listagem de pendências com paginação e filtros
 - Estatísticas de cobertura documental
