@@ -49,6 +49,24 @@ export class MongoRequirementRepository implements RequirementRepository {
     return modifiedCount === 1
   }
 
+  async reserveNextVersion(
+    id: string,
+    submittedAt: Date,
+  ): Promise<Requirement | null> {
+    const reserved = await this.requirements
+      .findOneAndUpdate(
+        { _id: id, deletedAt: null },
+        {
+          $inc: { currentVersion: 1 },
+          $set: { status: 'SUBMITTED', lastSubmittedAt: submittedAt },
+        },
+        { returnDocument: 'after' },
+      )
+      .exec()
+
+    return reserved && toRequirement(reserved)
+  }
+
   async softDeleteByEmployee(
     employeeId: string,
     deletedAt: Date,
