@@ -5,6 +5,8 @@ export const REQUIREMENT_REPOSITORY = Symbol('REQUIREMENT_REPOSITORY')
 
 export type RequirementFilters = {
   status?: RequirementStatus
+  employeeId?: string
+  documentTypeId?: string
 }
 
 export interface RequirementRepository {

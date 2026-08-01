@@ -58,10 +58,15 @@ export class MongoRequirementRepository implements RequirementRepository {
   }
 
   async list(
-    { status }: RequirementFilters,
+    { status, employeeId, documentTypeId }: RequirementFilters,
     { page, limit }: Pagination,
   ): Promise<Page<Requirement>> {
-    const matching = { deletedAt: null, ...(status && { status }) }
+    const matching = {
+      deletedAt: null,
+      ...(status && { status }),
+      ...(employeeId && { employeeId }),
+      ...(documentTypeId && { documentTypeId }),
+    }
     const [documents, total] = await Promise.all([
       this.requirements
         .find(matching)
