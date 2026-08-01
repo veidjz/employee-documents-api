@@ -2,6 +2,8 @@
 
 API REST para o fluxo de documentação obrigatória de colaboradores. Cada colaborador é vinculado aos tipos de documento que precisa entregar, e a API acompanha o que está pendente, o que já foi enviado e em qual versão.
 
+**No ar:** https://employee-documents-api-production.up.railway.app, com a documentação interativa em [/docs](https://employee-documents-api-production.up.railway.app/docs) e a base carregada com os dados de exemplo do seed. A API roda no Railway a partir do `Dockerfile` deste repositório; o banco é um replica set gerenciado, porque o domínio depende de transação multi-documento.
+
 ## Escopo
 
 - Cadastro de colaboradores
