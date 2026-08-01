@@ -142,4 +142,37 @@ describe('Submissions (e2e)', () => {
     expect(data[0].fileName).toBe('third.pdf')
     expect(meta).toEqual({ page: 1, limit: 2, total: 3, totalPages: 2 })
   })
+
+  it('rejects both endpoints when the requirement was unlinked', async () => {
+    const requirementId = await linkRequirement()
+
+    await submit(requirementId, 'aso-ana.pdf')
+
+    const { employeeId, documentTypeId } = await requirements
+      .findById(requirementId)
+      .orFail()
+      .exec()
+
+    await request(app.getHttpServer())
+      .delete(
+        `/employees/${employeeId.toString()}/requirements/${documentTypeId.toString()}`,
+      )
+      .expect(204)
+
+    const submitted = await request(app.getHttpServer())
+      .post(`/requirements/${requirementId}/submissions`)
+      .send({
+        fileName: 'aso-ana.pdf',
+        contentType: 'application/pdf',
+        sizeBytes: 184320,
+      })
+      .expect(404)
+
+    const listed = await request(app.getHttpServer())
+      .get(`/requirements/${requirementId}/submissions`)
+      .expect(404)
+
+    expect(submitted.body).toMatchObject({ code: 'REQUIREMENT_NOT_FOUND' })
+    expect(listed.body).toMatchObject({ code: 'REQUIREMENT_NOT_FOUND' })
+  })
 })
