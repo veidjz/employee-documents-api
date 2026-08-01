@@ -17,7 +17,14 @@ export class MongoRequirementRepository implements RequirementRepository {
   async link(employeeId: string, documentTypeId: string): Promise<Requirement> {
     try {
       return toRequirement(
-        await this.requirements.create({ employeeId, documentTypeId }),
+        await this.requirements
+          .findOneAndUpdate(
+            { employeeId, documentTypeId, deletedAt: { $ne: null } },
+            { $set: { deletedAt: null } },
+            { upsert: true, returnDocument: 'after' },
+          )
+          .orFail()
+          .exec(),
       )
     } catch (error) {
       if (isDuplicateKey(error)) {
