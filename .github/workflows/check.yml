@@ -26,4 +26,9 @@ jobs:
 
       - run: pnpm test
 
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-binaries-${{ hashFiles('package.json') }}
+
       - run: pnpm test:e2e
