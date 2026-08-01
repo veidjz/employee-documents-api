@@ -2,9 +2,13 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { QueryFilter, Model } from 'mongoose'
 import { ConflictError } from '../../../shared/domain/domain-error'
+import { Page, Pagination } from '../../../shared/domain/page'
 import { isDuplicateKey } from '../../../shared/mongo/duplicate-key'
 import { Requirement } from '../../domain/requirement'
-import { RequirementRepository } from '../../domain/requirement.repository'
+import {
+  RequirementFilters,
+  RequirementRepository,
+} from '../../domain/requirement.repository'
 import { RequirementDocument, RequirementModel } from './requirement.schema'
 
 @Injectable()
@@ -51,6 +55,24 @@ export class MongoRequirementRepository implements RequirementRepository {
       .exec()
 
     return unlinked && unlinked._id.toString()
+  }
+
+  async list(
+    { status }: RequirementFilters,
+    { page, limit }: Pagination,
+  ): Promise<Page<Requirement>> {
+    const matching = { deletedAt: null, ...(status && { status }) }
+    const [documents, total] = await Promise.all([
+      this.requirements
+        .find(matching)
+        .sort({ _id: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      this.requirements.countDocuments(matching).exec(),
+    ])
+
+    return { data: documents.map(toRequirement), total }
   }
 
   async findById(id: string): Promise<Requirement | null> {
