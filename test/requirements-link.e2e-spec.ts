@@ -115,6 +115,30 @@ describe('Requirements link (e2e)', () => {
     await expect(requirements.countDocuments()).resolves.toBe(1)
   })
 
+  it('revives the same requirement when the pair is linked again', async () => {
+    const employeeId = await createEmployee()
+    const asoId = await createDocumentType('ASO')
+
+    const linked = await request(app.getHttpServer())
+      .post(`/employees/${employeeId}/requirements`)
+      .send({ documentTypeIds: [asoId] })
+      .expect(201)
+
+    await request(app.getHttpServer())
+      .delete(`/employees/${employeeId}/requirements/${asoId}`)
+      .expect(204)
+
+    const relinked = await request(app.getHttpServer())
+      .post(`/employees/${employeeId}/requirements`)
+      .send({ documentTypeIds: [asoId] })
+      .expect(201)
+
+    const { data } = relinked.body as RequirementListView
+
+    expect(data[0].id).toBe((linked.body as RequirementListView).data[0].id)
+    await expect(requirements.countDocuments()).resolves.toBe(1)
+  })
+
   it('rejects a second unlink of the same document type', async () => {
     const employeeId = await createEmployee()
     const asoId = await createDocumentType('ASO')
