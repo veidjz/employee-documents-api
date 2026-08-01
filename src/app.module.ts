@@ -10,6 +10,7 @@ import { RequirementsModule } from './requirements/requirements.module'
 import { AllExceptionsFilter } from './shared/http/all-exceptions.filter'
 import { HealthController } from './shared/http/health.controller'
 import { validationPipe } from './shared/http/validation.pipe'
+import { StatsModule } from './stats/stats.module'
 
 mongoose.set('transactionAsyncLocalStorage', true)
 
@@ -26,6 +27,7 @@ mongoose.set('transactionAsyncLocalStorage', true)
     EmployeesModule,
     DocumentTypesModule,
     RequirementsModule,
+    StatsModule,
   ],
   controllers: [HealthController],
   providers: [

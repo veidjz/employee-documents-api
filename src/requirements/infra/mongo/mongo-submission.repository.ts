@@ -49,6 +49,16 @@ export class MongoSubmissionRepository implements SubmissionRepository {
     return { data: documents.map(toSubmission), total }
   }
 
+  async listLatest(limit: number): Promise<Submission[]> {
+    const documents = await this.submissions
+      .find({ deletedAt: null })
+      .sort({ submittedAt: -1, _id: -1 })
+      .limit(limit)
+      .exec()
+
+    return documents.map(toSubmission)
+  }
+
   async softDeleteByRequirements(
     requirementIds: string[],
     deletedAt: Date,
