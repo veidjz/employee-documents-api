@@ -157,3 +157,23 @@ O enunciado deixa pontos em aberto. Cada um foi resolvido por decisão declarada
 **Revincular um par removido preserva a numeração de versão.** O vínculo é o mesmo documento, então `currentVersion` nunca se perdeu, e o histórico anterior volta a ficar visível. Depois de um relink, o envio seguinte sai como a versão 3, e não como a versão 1. É comportamento escolhido, com teste, não efeito colateral.
 
 **404 e não 410 para o que foi removido logicamente.** O 410 informaria ao cliente que o recurso existiu e foi apagado, o que expõe a remoção lógica como detalhe de implementação para quem consome a API.
+
+## O que ficou de fora e por quê
+
+**Autenticação e autorização.** O enunciado declara que não seriam avaliadas. Entrariam como um guard global com a lista de rotas públicas, e o modelo de dados não mudaria.
+
+**O arquivo em si.** O envio registra metadados (nome, tipo, tamanho, versão), não os bytes. Guardar binário no MongoDB seria a escolha errada mesmo se houvesse tempo: o caminho é o cliente pedir uma URL assinada, subir direto para o object storage e a API guardar a chave. Nada do que este teste avalia muda com isso, porque versionamento, concorrência e estatística são sobre o registro, não sobre o conteúdo.
+
+**Recorrência.** Um ASO vence todo ano, e o modelo atual trata a exigência como única por par colaborador e tipo. Suportar recorrência seria acrescentar `validUntil` ou uma competência ao vínculo e incluir esse campo no índice único do par. É migração de índice, não de arquitetura, e foi deixada fora porque o enunciado não menciona validade.
+
+**Atualização de cadastro.** Não há `PATCH` nem `PUT` em colaborador ou tipo de documento, pela razão descrita na seção de ambiguidades.
+
+**`GET /document-types/:id`.** O contrato não pede consulta unitária de tipo de documento, e por isso o `201` desse cadastro não emite `Location`: o cabeçalho apontaria para uma URI que responde 404. Criar o endpoint só para justificar o cabeçalho seria escopo inventado.
+
+**Restauração explícita.** Não existe rota para desfazer uma remoção lógica. O único caminho de volta é revincular um par removido, que é uma operação do domínio e não uma administração do banco.
+
+**Paginação por cursor.** Medida e descartada com o número na seção de índices. Trocar `skip` por cursor mudaria o contrato do envelope, que hoje informa `totalPages`.
+
+**Observabilidade além do log.** Sem métricas, sem tracing distribuído e sem cache. O `x-request-id` é o gancho que um coletor usaria depois, e ele já existe. `exclude: ['/health']` no log de acesso só entra quando o deploy mostrar a frequência real da sonda da plataforma, porque silenciar uma rota antes de saber o volume dela é apagar sinal sem motivo.
+
+A regra que decidiu todas essas linhas é a mesma: nada entra no código antes de existir quem o consuma. Um método sem chamador, um campo sem leitor e uma configuração sem efeito custam manutenção e ainda dão a impressão de que o sistema faz algo que ele não faz.
