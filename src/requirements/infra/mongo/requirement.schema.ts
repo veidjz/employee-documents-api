@@ -30,3 +30,5 @@ export type RequirementDocument = HydratedDocument<RequirementModel>
 export const RequirementSchema = SchemaFactory.createForClass(RequirementModel)
 
 RequirementSchema.index({ employeeId: 1, documentTypeId: 1 }, { unique: true })
+
+RequirementSchema.index({ deletedAt: 1, status: 1, _id: -1 })
