@@ -30,6 +30,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:up": "docker compose up -d --wait mongo",
     "db:indexes": "ts-node scripts/sync-indexes.ts",
+    "db:seed": "ts-node scripts/seed.ts",
     "docker:up": "docker compose up -d --build --wait",
     "docker:down": "docker compose down"
   },
