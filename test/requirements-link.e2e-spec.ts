@@ -92,4 +92,39 @@ describe('Requirements link (e2e)', () => {
       employee: { id: employeeId, name: 'Ana Souza' },
     })
   })
+
+  it('rejects a link to an employee that was soft deleted', async () => {
+    const employeeId = await createEmployee()
+    const asoId = await createDocumentType('ASO')
+
+    await request(app.getHttpServer())
+      .delete(`/employees/${employeeId}`)
+      .expect(204)
+
+    const response = await request(app.getHttpServer())
+      .post(`/employees/${employeeId}/requirements`)
+      .send({ documentTypeIds: [asoId] })
+      .expect(404)
+
+    expect(response.body).toMatchObject({ code: 'EMPLOYEE_NOT_FOUND' })
+    await expect(requirements.countDocuments()).resolves.toBe(0)
+  })
+
+  it('rejects the whole batch when one document type was soft deleted', async () => {
+    const employeeId = await createEmployee()
+    const asoId = await createDocumentType('ASO')
+    const cnhId = await createDocumentType('CNH')
+
+    await request(app.getHttpServer())
+      .delete(`/document-types/${cnhId}`)
+      .expect(204)
+
+    const response = await request(app.getHttpServer())
+      .post(`/employees/${employeeId}/requirements`)
+      .send({ documentTypeIds: [asoId, cnhId] })
+      .expect(404)
+
+    expect(response.body).toMatchObject({ code: 'DOCUMENT_TYPE_NOT_FOUND' })
+    await expect(requirements.countDocuments()).resolves.toBe(0)
+  })
 })
