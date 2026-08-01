@@ -46,6 +46,10 @@ class MissingRequirementRepository implements RequirementRepository {
     return Promise.reject(new Error('Unexpected link'))
   }
 
+  list(): Promise<Page<Requirement>> {
+    return Promise.reject(new Error('Unexpected listing'))
+  }
+
   unlink(): Promise<string | null> {
     return Promise.reject(new Error('Unexpected unlink'))
   }
