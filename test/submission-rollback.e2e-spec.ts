@@ -68,6 +68,13 @@ describe('Submission rollback (e2e)', () => {
     await submissions.syncIndexes()
   })
 
+  beforeEach(async () => {
+    await employees.deleteMany({})
+    await documentTypes.deleteMany({})
+    await requirements.deleteMany({})
+    await submissions.deleteMany({})
+  })
+
   afterAll(async () => {
     await app.close()
   })
