@@ -1,0 +1,87 @@
+import { Injectable } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
+import { Page, Pagination } from '../../../shared/domain/page'
+import { Submission } from '../../domain/submission'
+import {
+  NewSubmission,
+  SubmissionRepository,
+} from '../../domain/submission.repository'
+import { SubmissionDocument, SubmissionModel } from './submission.schema'
+
+@Injectable()
+export class MongoSubmissionRepository implements SubmissionRepository {
+  constructor(
+    @InjectModel(SubmissionModel.name)
+    private readonly submissions: Model<SubmissionModel>,
+  ) {}
+
+  async create(newSubmission: NewSubmission): Promise<Submission> {
+    const [created] = await this.submissions.create([newSubmission])
+
+    return toSubmission(created)
+  }
+
+  async deactivateActive(requirementId: string): Promise<void> {
+    await this.submissions
+      .updateOne(
+        { requirementId, isActive: true },
+        { $set: { isActive: false } },
+      )
+      .exec()
+  }
+
+  async listByRequirement(
+    requirementId: string,
+    { page, limit }: Pagination,
+  ): Promise<Page<Submission>> {
+    const requirementSubmissions = { requirementId, deletedAt: null }
+    const [documents, total] = await Promise.all([
+      this.submissions
+        .find(requirementSubmissions)
+        .sort({ version: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      this.submissions.countDocuments(requirementSubmissions).exec(),
+    ])
+
+    return { data: documents.map(toSubmission), total }
+  }
+
+  async softDeleteByRequirements(
+    requirementIds: string[],
+    deletedAt: Date,
+  ): Promise<void> {
+    await this.submissions
+      .updateMany(
+        { requirementId: { $in: requirementIds }, deletedAt: null },
+        { $set: { deletedAt } },
+      )
+      .exec()
+  }
+
+  async reviveByRequirements(requirementIds: string[]): Promise<void> {
+    await this.submissions
+      .updateMany(
+        { requirementId: { $in: requirementIds }, deletedAt: { $ne: null } },
+        { $set: { deletedAt: null } },
+      )
+      .exec()
+  }
+}
+
+function toSubmission(document: SubmissionDocument): Submission {
+  return {
+    id: document._id.toString(),
+    requirementId: document.requirementId.toString(),
+    employeeId: document.employeeId.toString(),
+    documentTypeId: document.documentTypeId.toString(),
+    version: document.version,
+    isActive: document.isActive,
+    fileName: document.fileName,
+    contentType: document.contentType,
+    sizeBytes: document.sizeBytes,
+    submittedAt: document.submittedAt,
+  }
+}

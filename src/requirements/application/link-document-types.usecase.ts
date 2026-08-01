@@ -17,6 +17,10 @@ import {
   REQUIREMENT_REPOSITORY,
   type RequirementRepository,
 } from '../domain/requirement.repository'
+import {
+  SUBMISSION_REPOSITORY,
+  type SubmissionRepository,
+} from '../domain/submission.repository'
 
 @Injectable()
 export class LinkDocumentTypesUseCase {
@@ -27,6 +31,8 @@ export class LinkDocumentTypesUseCase {
     private readonly documentTypes: DocumentTypeRepository,
     @Inject(REQUIREMENT_REPOSITORY)
     private readonly requirements: RequirementRepository,
+    @Inject(SUBMISSION_REPOSITORY)
+    private readonly submissions: SubmissionRepository,
     @Inject(TRANSACTION_RUNNER)
     private readonly transaction: TransactionRunner,
   ) {}
@@ -78,6 +84,10 @@ export class LinkDocumentTypesUseCase {
           createdAt: requirement.createdAt,
         })
       }
+
+      await this.submissions.reviveByRequirements(
+        linked.map((requirement) => requirement.id),
+      )
 
       return linked
     })

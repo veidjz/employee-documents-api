@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { QueryFilter, Model } from 'mongoose'
 import { ConflictError } from '../../../shared/domain/domain-error'
 import { isDuplicateKey } from '../../../shared/mongo/duplicate-key'
 import { Requirement } from '../../domain/requirement'
@@ -38,33 +38,70 @@ export class MongoRequirementRepository implements RequirementRepository {
     }
   }
 
-  async unlink(employeeId: string, documentTypeId: string): Promise<boolean> {
-    const { modifiedCount } = await this.requirements
-      .updateOne(
+  async unlink(
+    employeeId: string,
+    documentTypeId: string,
+    deletedAt: Date,
+  ): Promise<string | null> {
+    const unlinked = await this.requirements
+      .findOneAndUpdate(
         { employeeId, documentTypeId, deletedAt: null },
-        { $set: { deletedAt: new Date() } },
+        { $set: { deletedAt } },
       )
       .exec()
 
-    return modifiedCount === 1
+    return unlinked && unlinked._id.toString()
   }
 
-  async softDeleteByEmployee(
-    employeeId: string,
-    deletedAt: Date,
-  ): Promise<void> {
-    await this.requirements
-      .updateMany({ employeeId, deletedAt: null }, { $set: { deletedAt } })
+  async findById(id: string): Promise<Requirement | null> {
+    const found = await this.requirements
+      .findOne({ _id: id, deletedAt: null })
       .exec()
+
+    return found && toRequirement(found)
   }
 
-  async softDeleteByDocumentType(
+  async reserveNextVersion(
+    id: string,
+    submittedAt: Date,
+  ): Promise<Requirement | null> {
+    const reserved = await this.requirements
+      .findOneAndUpdate(
+        { _id: id, deletedAt: null },
+        {
+          $inc: { currentVersion: 1 },
+          $set: { status: 'SUBMITTED', lastSubmittedAt: submittedAt },
+        },
+        { returnDocument: 'after' },
+      )
+      .exec()
+
+    return reserved && toRequirement(reserved)
+  }
+
+  softDeleteByEmployee(employeeId: string, deletedAt: Date): Promise<string[]> {
+    return this.softDeleteActive({ employeeId, deletedAt: null }, deletedAt)
+  }
+
+  softDeleteByDocumentType(
     documentTypeId: string,
     deletedAt: Date,
-  ): Promise<void> {
+  ): Promise<string[]> {
+    return this.softDeleteActive({ documentTypeId, deletedAt: null }, deletedAt)
+  }
+
+  private async softDeleteActive(
+    active: QueryFilter<RequirementModel>,
+    deletedAt: Date,
+  ): Promise<string[]> {
+    const affected = await this.requirements.find(active).select('_id').exec()
+    const ids = affected.map((requirement) => requirement._id)
+
     await this.requirements
-      .updateMany({ documentTypeId, deletedAt: null }, { $set: { deletedAt } })
+      .updateMany({ _id: { $in: ids } }, { $set: { deletedAt } })
       .exec()
+
+    return ids.map((id) => id.toString())
   }
 }
 

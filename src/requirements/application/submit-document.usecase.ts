@@ -8,13 +8,20 @@ import {
   REQUIREMENT_REPOSITORY,
   type RequirementRepository,
 } from '../domain/requirement.repository'
+import { Submission } from '../domain/submission'
 import {
   SUBMISSION_REPOSITORY,
   type SubmissionRepository,
 } from '../domain/submission.repository'
 
+export type SubmittedFile = {
+  fileName: string
+  contentType: string
+  sizeBytes: number
+}
+
 @Injectable()
-export class UnlinkDocumentTypeUseCase {
+export class SubmitDocumentUseCase {
   constructor(
     @Inject(REQUIREMENT_REPOSITORY)
     private readonly requirements: RequirementRepository,
@@ -24,27 +31,32 @@ export class UnlinkDocumentTypeUseCase {
     private readonly transaction: TransactionRunner,
   ) {}
 
-  execute(employeeId: string, documentTypeId: string): Promise<void> {
-    const deletedAt = new Date()
+  execute(requirementId: string, file: SubmittedFile): Promise<Submission> {
+    const submittedAt = new Date()
 
     return this.transaction.run(async () => {
-      const requirementId = await this.requirements.unlink(
-        employeeId,
-        documentTypeId,
-        deletedAt,
+      const requirement = await this.requirements.reserveNextVersion(
+        requirementId,
+        submittedAt,
       )
 
-      if (!requirementId) {
+      if (!requirement) {
         throw new NotFoundError(
           'REQUIREMENT_NOT_FOUND',
           'Requirement not found',
         )
       }
 
-      await this.submissions.softDeleteByRequirements(
-        [requirementId],
-        deletedAt,
-      )
+      await this.submissions.deactivateActive(requirement.id)
+
+      return this.submissions.create({
+        requirementId: requirement.id,
+        employeeId: requirement.employeeId,
+        documentTypeId: requirement.documentTypeId,
+        version: requirement.currentVersion,
+        submittedAt,
+        ...file,
+      })
     })
   }
 }
