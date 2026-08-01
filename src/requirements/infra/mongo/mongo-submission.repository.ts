@@ -20,6 +20,15 @@ export class MongoSubmissionRepository implements SubmissionRepository {
 
     return toSubmission(created)
   }
+
+  async deactivateActive(requirementId: string): Promise<void> {
+    await this.submissions
+      .updateOne(
+        { requirementId, isActive: true },
+        { $set: { isActive: false } },
+      )
+      .exec()
+  }
 }
 
 function toSubmission(document: SubmissionDocument): Submission {

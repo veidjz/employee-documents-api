@@ -47,6 +47,8 @@ export class SubmitDocumentUseCase {
         )
       }
 
+      await this.submissions.deactivateActive(requirement.id)
+
       return this.submissions.create({
         requirementId: requirement.id,
         employeeId: requirement.employeeId,
