@@ -147,6 +147,28 @@ describe('Stats overview (e2e)', () => {
     })
   })
 
+  it('ranks the top pending document types and hydrates their names', async () => {
+    const anaId = await createEmployee('Ana Souza', '52998224725')
+    const brunoId = await createEmployee('Bruno Lima', '11144477735')
+    const carlaId = await createEmployee('Carla Dias', '12345678909')
+    const asoId = await createDocumentType('ASO')
+    const cnhId = await createDocumentType('CNH')
+    const rgId = await createDocumentType('RG')
+
+    const [, , anaRg] = await link(anaId, [asoId, cnhId, rgId])
+    await link(brunoId, [asoId, cnhId])
+    await link(carlaId, [asoId])
+
+    await submit(anaRg.id)
+
+    const { topPendingDocumentTypes } = await overview()
+
+    expect(topPendingDocumentTypes).toEqual([
+      { id: asoId, name: 'ASO', slug: 'aso', pendingCount: 3 },
+      { id: cnhId, name: 'CNH', slug: 'cnh', pendingCount: 2 },
+    ])
+  })
+
   it('reports a null completion rate when there is no requirement', async () => {
     const { requirements: totals, employees } = await overview()
 
