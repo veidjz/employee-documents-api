@@ -175,4 +175,48 @@ describe('Submissions (e2e)', () => {
     expect(submitted.body).toMatchObject({ code: 'REQUIREMENT_NOT_FOUND' })
     expect(listed.body).toMatchObject({ code: 'REQUIREMENT_NOT_FOUND' })
   })
+
+  it('preserves the version and the history when the pair is linked again', async () => {
+    const requirementId = await linkRequirement()
+
+    await submit(requirementId, 'first.pdf')
+    await submit(requirementId, 'second.pdf')
+
+    const { employeeId, documentTypeId } = await requirements
+      .findById(requirementId)
+      .orFail()
+      .exec()
+
+    await request(app.getHttpServer())
+      .delete(
+        `/employees/${employeeId.toString()}/requirements/${documentTypeId.toString()}`,
+      )
+      .expect(204)
+
+    const relinked = await request(app.getHttpServer())
+      .post(`/employees/${employeeId.toString()}/requirements`)
+      .send({ documentTypeIds: [documentTypeId.toString()] })
+      .expect(201)
+
+    expect((relinked.body as RequirementListView).data[0]).toMatchObject({
+      id: requirementId,
+      status: 'SUBMITTED',
+      currentVersion: 2,
+    })
+
+    const history = await request(app.getHttpServer())
+      .get(`/requirements/${requirementId}/submissions`)
+      .expect(200)
+
+    const { data } = history.body as SubmissionPageView
+
+    expect(data.map((submission) => submission.version)).toEqual([2, 1])
+    expect(data[0].isActive).toBe(true)
+
+    const resubmitted = await submit(requirementId, 'third.pdf')
+
+    expect(resubmitted.body).toMatchObject<Partial<SubmissionView>>({
+      version: 3,
+    })
+  })
 })
