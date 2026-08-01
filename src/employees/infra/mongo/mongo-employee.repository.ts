@@ -56,6 +56,14 @@ export class MongoEmployeeRepository implements EmployeeRepository {
     return found && toEmployee(found)
   }
 
+  async findByIds(ids: string[]): Promise<Employee[]> {
+    const documents = await this.employees
+      .find({ _id: { $in: ids }, deletedAt: null })
+      .exec()
+
+    return documents.map(toEmployee)
+  }
+
   async softDelete(id: string, deletedAt: Date): Promise<boolean> {
     const { modifiedCount } = await this.employees
       .updateOne({ _id: id, deletedAt: null }, { $set: { deletedAt } })
