@@ -30,6 +30,17 @@ export class MongoRequirementRepository implements RequirementRepository {
       throw error
     }
   }
+
+  async unlink(employeeId: string, documentTypeId: string): Promise<boolean> {
+    const { modifiedCount } = await this.requirements
+      .updateOne(
+        { employeeId, documentTypeId, deletedAt: null },
+        { $set: { deletedAt: new Date() } },
+      )
+      .exec()
+
+    return modifiedCount === 1
+  }
 }
 
 function toRequirement(document: RequirementDocument): Requirement {

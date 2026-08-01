@@ -3,6 +3,7 @@ import { DocumentTypesModule } from '../document-types/document-types.module'
 import { EmployeesModule } from '../employees/employees.module'
 import { TransactionModule } from '../shared/mongo/transaction.module'
 import { LinkDocumentTypesUseCase } from './application/link-document-types.usecase'
+import { UnlinkDocumentTypeUseCase } from './application/unlink-document-type.usecase'
 import { EmployeeRequirementsController } from './infra/http/employee-requirements.controller'
 import { RequirementPersistenceModule } from './requirement-persistence.module'
 
@@ -14,6 +15,6 @@ import { RequirementPersistenceModule } from './requirement-persistence.module'
     TransactionModule,
   ],
   controllers: [EmployeeRequirementsController],
-  providers: [LinkDocumentTypesUseCase],
+  providers: [LinkDocumentTypesUseCase, UnlinkDocumentTypeUseCase],
 })
 export class RequirementsModule {}
