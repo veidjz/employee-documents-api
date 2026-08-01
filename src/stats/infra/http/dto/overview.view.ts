@@ -13,8 +13,16 @@ export class EmployeeComplianceView {
   complianceRate!: number | null
 }
 
+export class TopPendingDocumentTypeView {
+  id!: string
+  name!: string
+  slug!: string
+  pendingCount!: number
+}
+
 export class OverviewView implements Overview {
   generatedAt!: Date
   requirements!: RequirementTotalsView
   employees!: EmployeeComplianceView
+  topPendingDocumentTypes!: TopPendingDocumentTypeView[]
 }

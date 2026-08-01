@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common'
+import { DocumentTypesModule } from '../document-types/document-types.module'
 import { RequirementPersistenceModule } from '../requirements/requirement-persistence.module'
 import { GetOverviewUseCase } from './application/get-overview.usecase'
 import { STATS_REPOSITORY } from './domain/stats.repository'
@@ -6,7 +7,7 @@ import { StatsController } from './infra/http/stats.controller'
 import { MongoStatsRepository } from './infra/mongo/mongo-stats.repository'
 
 @Module({
-  imports: [RequirementPersistenceModule],
+  imports: [RequirementPersistenceModule, DocumentTypesModule],
   controllers: [StatsController],
   providers: [
     GetOverviewUseCase,
