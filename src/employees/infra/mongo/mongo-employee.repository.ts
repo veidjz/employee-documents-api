@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model, mongo } from 'mongoose'
+import { Model } from 'mongoose'
 import { ConflictError } from '../../../shared/domain/domain-error'
 import { Page, Pagination } from '../../../shared/domain/page'
+import { isDuplicateKey } from '../../../shared/mongo/duplicate-key'
 import { Employee } from '../../domain/employee'
 import {
   EmployeeRepository,
@@ -65,12 +66,6 @@ export class MongoEmployeeRepository implements EmployeeRepository {
 
     return modifiedCount === 1
   }
-}
-
-function isDuplicateKey(
-  error: unknown,
-): error is mongo.MongoServerError & { keyPattern: Record<string, number> } {
-  return error instanceof mongo.MongoServerError && error.code === 11000
 }
 
 function toEmployee(document: EmployeeDocument): Employee {
