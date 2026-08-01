@@ -51,6 +51,11 @@ export class LinkDocumentTypesUseCase {
         )
       }
 
+      documentTypes.sort(
+        (left, right) =>
+          documentTypeIds.indexOf(left.id) - documentTypeIds.indexOf(right.id),
+      )
+
       const linked: RequirementDetails[] = []
 
       for (const documentType of documentTypes) {

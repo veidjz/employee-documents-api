@@ -76,15 +76,16 @@ describe('Requirements link (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .post(`/employees/${employeeId}/requirements`)
-      .send({ documentTypeIds: [asoId, cnhId] })
+      .send({ documentTypeIds: [cnhId, asoId] })
       .expect(201)
 
     const { data } = response.body as RequirementListView
 
     expect(data).toHaveLength(2)
-    expect(
-      data.map((requirement) => requirement.documentType.id).sort(),
-    ).toEqual([asoId, cnhId].sort())
+    expect(data.map((requirement) => requirement.documentType.id)).toEqual([
+      cnhId,
+      asoId,
+    ])
     expect(data[0]).toMatchObject({
       status: 'PENDING',
       currentVersion: 0,
