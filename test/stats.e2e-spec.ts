@@ -122,4 +122,15 @@ describe('Stats overview (e2e)', () => {
       completionRate: 0.3333,
     })
   })
+
+  it('reports a null completion rate when there is no requirement', async () => {
+    const { requirements: totals } = await overview()
+
+    expect(totals).toEqual({
+      total: 0,
+      submitted: 0,
+      pending: 0,
+      completionRate: null,
+    })
+  })
 })
