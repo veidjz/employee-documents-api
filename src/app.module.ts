@@ -47,6 +47,7 @@ mongoose.set('transactionAsyncLocalStorage', true)
       useFactory: (configService: ConfigService) => ({
         uri: configService.getOrThrow<string>('MONGO_URL'),
         serverSelectionTimeoutMS: 5000,
+        autoIndex: false,
       }),
     }),
     EmployeesModule,
