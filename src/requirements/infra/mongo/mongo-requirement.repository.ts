@@ -48,6 +48,15 @@ export class MongoRequirementRepository implements RequirementRepository {
 
     return modifiedCount === 1
   }
+
+  async softDeleteByEmployee(
+    employeeId: string,
+    deletedAt: Date,
+  ): Promise<void> {
+    await this.requirements
+      .updateMany({ employeeId, deletedAt: null }, { $set: { deletedAt } })
+      .exec()
+  }
 }
 
 function toRequirement(document: RequirementDocument): Requirement {
