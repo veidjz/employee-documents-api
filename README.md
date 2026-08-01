@@ -77,6 +77,26 @@ As duas são validadas na subida, e a aplicação recusa iniciar com valor invá
 
 As versões exatas vivem em `package.json`, `.nvmrc` e `docker-compose.yml`. Este documento registra o critério de escolha, não o número, porque número em documentação envelhece em silêncio.
 
+## Arquitetura
+
+Cada módulo de negócio tem três camadas, e a dependência só aponta para dentro:
+
+```
+src/employees/
+  domain/        tipos e funções puras, mais a porta do repositório
+  application/   casos de uso, que dependem das portas
+  infra/mongo/   o adaptador, o schema do Mongoose
+  infra/http/    o controller e os DTOs
+```
+
+`domain/` não importa framework nem ODM. `application/` importa `domain/` e `@nestjs/common`, nunca `mongoose` nem `express`. `infra/mongo/` é o único lugar do projeto onde `mongoose` aparece. **A regra não é convenção, é lint:** `eslint.config.mjs` declara `no-restricted-imports` por caminho, então um import errado reprova o `pnpm lint` e o CI antes de qualquer revisão humana.
+
+Isso é o que a inversão compra na prática: um caso de uso que precisa de atomicidade não consegue injetar `Connection` nem receber `ClientSession`, porque o lint não deixa. Ele recebe a porta `TransactionRunner` e chama `run`.
+
+**Não chamo isso de hexagonal.** Hexagonal define porta e adaptador para toda dependência externa, incluindo a de entrada, e aqui o controller do Nest fala direto com o caso de uso. Portas existem onde elas se pagam: persistência e fronteira transacional. Inventar uma porta de entrada para satisfazer o diagrama acrescentaria uma camada de tradução sem nenhum segundo adaptador do outro lado. Também não há DDD tático: não existe entidade rica, agregado com invariante interna nem repositório devolvendo objeto de domínio com comportamento. As regras deste domínio são de unicidade e de ordem de escrita, e elas vivem onde podem ser garantidas, que é o banco e a fronteira transacional, não num método de entidade.
+
+Fora dos módulos de negócio existem `src/shared/`, com o tratador global de exceções, o envelope de paginação e o `TransactionRunner`, e `src/config/`, com a validação das variáveis de ambiente. Todo teste vive em `test/`, fora de `src/`, que só tem código de produção.
+
 ## Modelo de dados
 
 Quatro coleções. O par colaborador e tipo de documento não é um array embutido em nenhum dos dois lados: ele é uma coleção própria, `requirements`, porque é ele que carrega estado (pendente ou entregue), versão corrente e histórico. Embutir a lista de exigências no colaborador faria a listagem global de pendências varrer todos os colaboradores e desmontar cada array, e faria a remoção lógica de um tipo de documento reescrever todo colaborador que o referencia.
