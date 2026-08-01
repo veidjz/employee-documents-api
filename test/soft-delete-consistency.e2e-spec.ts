@@ -46,7 +46,10 @@ describe('Soft delete consistency (e2e)', () => {
     await app.close()
   })
 
-  async function linkTwoDocumentTypes(): Promise<string> {
+  async function linkTwoDocumentTypes(): Promise<{
+    employeeId: string
+    documentTypeIds: string[]
+  }> {
     const employee = await request(app.getHttpServer())
       .post('/employees')
       .send({
@@ -74,11 +77,11 @@ describe('Soft delete consistency (e2e)', () => {
       .send({ documentTypeIds })
       .expect(201)
 
-    return employeeId
+    return { employeeId, documentTypeIds }
   }
 
   it('removes the requirements of an employee at the same instant', async () => {
-    const employeeId = await linkTwoDocumentTypes()
+    const { employeeId } = await linkTwoDocumentTypes()
 
     await request(app.getHttpServer())
       .delete(`/employees/${employeeId}`)
@@ -91,5 +94,30 @@ describe('Soft delete consistency (e2e)', () => {
     for (const requirement of removedRequirements) {
       expect(requirement.deletedAt).toEqual(removedEmployee.deletedAt)
     }
+  })
+
+  it('removes only the requirements of the removed document type', async () => {
+    const { documentTypeIds } = await linkTwoDocumentTypes()
+    const [asoId, cnhId] = documentTypeIds
+
+    await request(app.getHttpServer())
+      .delete(`/document-types/${cnhId}`)
+      .expect(204)
+
+    const removedDocumentType = await documentTypes
+      .findById(cnhId)
+      .orFail()
+      .exec()
+    const activeRequirements = await requirements
+      .find({ deletedAt: null })
+      .exec()
+    const removedRequirement = await requirements
+      .findOne({ documentTypeId: cnhId })
+      .orFail()
+      .exec()
+
+    expect(activeRequirements).toHaveLength(1)
+    expect(activeRequirements[0].documentTypeId.toString()).toBe(asoId)
+    expect(removedRequirement.deletedAt).toEqual(removedDocumentType.deletedAt)
   })
 })
