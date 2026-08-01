@@ -8,12 +8,14 @@ import { AppModule } from '../src/app.module'
 import { DocumentTypeModel } from '../src/document-types/infra/mongo/document-type.schema'
 import { EmployeeModel } from '../src/employees/infra/mongo/employee.schema'
 import { RequirementModel } from '../src/requirements/infra/mongo/requirement.schema'
+import { SubmissionModel } from '../src/requirements/infra/mongo/submission.schema'
 
 describe('Soft delete consistency (e2e)', () => {
   let app: INestApplication<App>
   let employees: Model<EmployeeModel>
   let documentTypes: Model<DocumentTypeModel>
   let requirements: Model<RequirementModel>
+  let submissions: Model<SubmissionModel>
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
@@ -31,15 +33,21 @@ describe('Soft delete consistency (e2e)', () => {
       getModelToken(RequirementModel.name),
     )
 
+    submissions = app.get<Model<SubmissionModel>>(
+      getModelToken(SubmissionModel.name),
+    )
+
     await employees.syncIndexes()
     await documentTypes.syncIndexes()
     await requirements.syncIndexes()
+    await submissions.syncIndexes()
   })
 
   beforeEach(async () => {
     await employees.deleteMany({})
     await documentTypes.deleteMany({})
     await requirements.deleteMany({})
+    await submissions.deleteMany({})
   })
 
   afterAll(async () => {
@@ -119,5 +127,59 @@ describe('Soft delete consistency (e2e)', () => {
     expect(activeRequirements).toHaveLength(1)
     expect(activeRequirements[0].documentTypeId.toString()).toBe(asoId)
     expect(removedRequirement.deletedAt).toEqual(removedDocumentType.deletedAt)
+  })
+
+  it('removes the submissions of an employee at the same instant', async () => {
+    const { employeeId } = await linkTwoDocumentTypes()
+    const linkedRequirements = await requirements.find().exec()
+
+    for (const requirement of linkedRequirements) {
+      await request(app.getHttpServer())
+        .post(`/requirements/${requirement._id.toString()}/submissions`)
+        .send({
+          fileName: 'aso-ana.pdf',
+          contentType: 'application/pdf',
+          sizeBytes: 184320,
+        })
+        .expect(201)
+    }
+
+    await request(app.getHttpServer())
+      .delete(`/employees/${employeeId}`)
+      .expect(204)
+
+    const removedEmployee = await employees.findById(employeeId).orFail().exec()
+    const removedSubmissions = await submissions.find().exec()
+
+    expect(removedSubmissions).toHaveLength(2)
+    for (const submission of removedSubmissions) {
+      expect(submission.deletedAt).toEqual(removedEmployee.deletedAt)
+    }
+  })
+
+  it('removes only the submissions of the removed document type', async () => {
+    const { documentTypeIds } = await linkTwoDocumentTypes()
+    const [asoId, cnhId] = documentTypeIds
+    const linkedRequirements = await requirements.find().exec()
+
+    for (const requirement of linkedRequirements) {
+      await request(app.getHttpServer())
+        .post(`/requirements/${requirement._id.toString()}/submissions`)
+        .send({
+          fileName: 'documento.pdf',
+          contentType: 'application/pdf',
+          sizeBytes: 184320,
+        })
+        .expect(201)
+    }
+
+    await request(app.getHttpServer())
+      .delete(`/document-types/${cnhId}`)
+      .expect(204)
+
+    const activeSubmissions = await submissions.find({ deletedAt: null }).exec()
+
+    expect(activeSubmissions).toHaveLength(1)
+    expect(activeSubmissions[0].documentTypeId.toString()).toBe(asoId)
   })
 })
