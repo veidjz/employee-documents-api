@@ -129,3 +129,31 @@ Isso é o que a dependência compra. JSON sozinho não exigiria dependência nen
 **A requisição é logada por lista de permissão, não de proibição.** O serializer reduz a requisição a `id`, `method` e `url` e a resposta a `statusCode`. Ficam de fora o corpo, a query, os parâmetros de rota, os cabeçalhos de entrada, o endereço remoto e o dump inteiro dos cabeçalhos de resposta. A garantia é estrutural: um campo acrescentado depois não vaza por esquecimento, porque o que não está no serializer não é logado. Efeito colateral medido na linha de acesso: 618 para 236 bytes.
 
 Em desenvolvimento, `pnpm start:dev | npx pino-pretty` deixa a saída legível sem que o formatador entre como dependência do projeto.
+
+## Ambiguidades do enunciado
+
+O enunciado deixa pontos em aberto. Cada um foi resolvido por decisão declarada, e não por omissão.
+
+**"Percentual de documentação completa" tem mais de uma leitura.** O endpoint expõe duas, porque elas respondem perguntas diferentes: `completionRate` é entregas sobre exigências, a visão da operação; `complianceRate` é colaboradores 100% em dia sobre colaboradores com ao menos um vínculo, a visão de auditoria. A terceira leitura possível, média das médias por colaborador, foi descartada porque pondera igual quem tem 1 documento e quem tem 20.
+
+**O denominador de `complianceRate` são os colaboradores com vínculo, não a folha inteira.** Quem não tem nenhuma exigência não está em dia nem em falta, e colocá-lo no denominador faria a taxa cair a cada admissão antes de qualquer vínculo ser criado. Há teste fixando isso.
+
+**Base vazia devolve 200 com as duas taxas em `null`,** e não em `0`. Zero por cento entregue e nada para entregar são fatos diferentes, e `0` faria um painel acusar problema onde não há dado.
+
+**"Tipos mais frequentemente pendentes" é um retrato do agora,** a contagem de vínculos em `PENDING` por tipo, top 5. A leitura alternativa, quantas vezes cada tipo já ficou pendente ao longo do tempo, exigiria trilha de mudança de status que ninguém pediu.
+
+**"Últimos envios" são os 10 mais recentes e não filtram por versão ativa.** Todo envio é um envio realizado; esconder as versões substituídas apagaria o reenvio, que é justamente o evento interessante da lista.
+
+**"Cadastro" foi lido como criar, listar, consultar e remover logicamente. Sem update.** O enunciado não descreve fluxo de correção cadastral, e um `PATCH` de nome exigiria decidir a semântica de update em campo único sem nenhum requisito para ancorar a decisão.
+
+**A remoção lógica melhora o `completionRate`,** porque os vínculos pendentes do removido saem do denominador. É contraintuitivo e é correto: quem sai do sistema deixa de ser cobrado, que é a mesma semântica de um desligamento.
+
+**Desvincular apaga o envio das estatísticas.** A exigência deixou de existir, então o documento entregue para ela deixa de contar como entrega e sai de "últimos envios". Coberto por teste.
+
+**Filtrar por um colaborador removido devolve 200 com lista vazia,** enquanto `GET /employees/:id` do mesmo identificador devolve 404. Filtro é filtro: uma busca sem resultado é 200 com zero itens, e um recurso que não existe é 404.
+
+**Recriar um tipo de documento com o slug de um tipo removido cria um registro novo,** e os vínculos antigos continuam removidos. Vínculo revive por par de identificadores porque a intenção é inequívoca; tipo de documento não revive por slug, porque reviver por texto igual seria adivinhar a intenção e ressuscitar vínculos que ninguém pediu de volta.
+
+**Revincular um par removido preserva a numeração de versão.** O vínculo é o mesmo documento, então `currentVersion` nunca se perdeu, e o histórico anterior volta a ficar visível. Depois de um relink, o envio seguinte sai como a versão 3, e não como a versão 1. É comportamento escolhido, com teste, não efeito colateral.
+
+**404 e não 410 para o que foi removido logicamente.** O 410 informaria ao cliente que o recurso existiu e foi apagado, o que expõe a remoção lógica como detalhe de implementação para quem consome a API.
