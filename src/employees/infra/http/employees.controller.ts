@@ -7,7 +7,9 @@ import {
   Param,
   Post,
   Query,
+  Res,
 } from '@nestjs/common'
+import type { Response } from 'express'
 import { ParseObjectIdPipe } from '../../../shared/http/object-id.pipe'
 import { PaginationQuery } from '../../../shared/http/pagination.query'
 import { toPageView } from '../../../shared/http/page.view'
@@ -28,8 +30,14 @@ export class EmployeesController {
   ) {}
 
   @Post()
-  create(@Body() body: CreateEmployeeBody): Promise<EmployeeView> {
-    return this.createEmployee.execute(body)
+  async create(
+    @Body() body: CreateEmployeeBody,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<EmployeeView> {
+    const employee = await this.createEmployee.execute(body)
+    response.setHeader('Location', `/employees/${employee.id}`)
+
+    return employee
   }
 
   @Get()
