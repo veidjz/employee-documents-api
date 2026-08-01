@@ -3,6 +3,11 @@ import { Employee } from '../../employees/domain/employee'
 
 export type RequirementStatus = 'PENDING' | 'SUBMITTED'
 
+export const REQUIREMENT_STATUSES: RequirementStatus[] = [
+  'PENDING',
+  'SUBMITTED',
+]
+
 export type Requirement = {
   id: string
   employeeId: string

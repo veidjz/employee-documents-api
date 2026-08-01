@@ -1,3 +1,4 @@
+import { PageMeta } from '../../../../shared/http/page.view'
 import {
   RequirementDetails,
   RequirementStatus,
@@ -26,4 +27,9 @@ export class RequirementView implements RequirementDetails {
 
 export class RequirementListView {
   data!: RequirementView[]
+}
+
+export class RequirementPageView {
+  data!: RequirementView[]
+  meta!: PageMeta
 }
