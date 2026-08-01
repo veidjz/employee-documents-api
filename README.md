@@ -13,6 +13,57 @@ API REST para o fluxo de documentação obrigatória de colaboradores. Cada cola
 
 Colaboradores e documentos nunca são removidos fisicamente. A remoção é lógica e se reflete em toda consulta, filtro e estatística.
 
+## Como rodar
+
+Docker e Docker Compose sobem a stack. Node e pnpm são necessários para os scripts operacionais e para a suíte de testes; as versões estão em `.nvmrc` e no campo `packageManager` do `package.json`, e `corepack enable` resolve o pnpm.
+
+```bash
+cp .env.example .env
+pnpm install
+```
+
+### Stack completa em Docker
+
+```bash
+pnpm docker:up      # sobe o MongoDB em replica set e a API, e espera ficar saudável
+pnpm db:indexes     # cria os índices
+pnpm db:seed        # opcional: popula com dados de exemplo
+```
+
+A API responde em `http://localhost:3000`, a documentação interativa em `/docs` e a sonda em `/health`. `pnpm docker:down` derruba tudo.
+
+**O passo dos índices não é opcional.** A aplicação sobe com `autoIndex` desligado por decisão, explicada na seção de índices, então uma base recém-criada não tem nenhuma restrição de unicidade até o script rodar. Ele é idempotente e pode ser repetido à vontade.
+
+### API no host, banco em Docker
+
+É o modo de desenvolvimento, com recarga automática:
+
+```bash
+pnpm db:up          # sobe apenas o MongoDB
+pnpm db:indexes
+pnpm db:seed
+pnpm start:dev
+```
+
+### Testes
+
+```bash
+pnpm test           # unitários
+pnpm test:e2e       # ponta a ponta contra um MongoDB de verdade
+pnpm check          # lint, typecheck e as duas suítes
+```
+
+A suíte e2e não usa stub de banco: ela sobe um replica set em memória com o `mongodb-memory-server`, fixado na mesma versão do MongoDB da imagem do compose. **A primeira execução baixa o binário do MongoDB, cerca de 120MB**, e o cacheia em `~/.cache/mongodb-binaries`; as seguintes são imediatas. Para rodar contra um MongoDB já de pé em vez do binário em memória, basta `MONGO_URL=... pnpm test:e2e`.
+
+### Variáveis de ambiente
+
+| Variável | Para que serve |
+|---|---|
+| `PORT` | Porta HTTP da API |
+| `MONGO_URL` | String de conexão do MongoDB, que precisa apontar para um replica set |
+
+As duas são validadas na subida, e a aplicação recusa iniciar com valor inválido em vez de falhar na primeira requisição. O replica set não é preferência: sem ele o MongoDB não aceita transação multi-documento, e a API depende disso no envio de documento e na remoção lógica em cascata.
+
 ## Stack
 
 | Camada | Escolha | Motivo |
