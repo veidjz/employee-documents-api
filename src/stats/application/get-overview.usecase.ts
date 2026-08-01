@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { completionRate } from '../domain/completion-rate'
 import { Overview } from '../domain/overview'
+import { rate } from '../domain/rate'
 import {
   STATS_REPOSITORY,
   type StatsRepository,
@@ -19,10 +19,7 @@ export class GetOverviewUseCase {
       generatedAt: new Date(),
       requirements: {
         ...requirements,
-        completionRate: completionRate(
-          requirements.submitted,
-          requirements.total,
-        ),
+        completionRate: rate(requirements.submitted, requirements.total),
       },
     }
   }
