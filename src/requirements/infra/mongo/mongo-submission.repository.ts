@@ -48,6 +48,18 @@ export class MongoSubmissionRepository implements SubmissionRepository {
 
     return { data: documents.map(toSubmission), total }
   }
+
+  async softDeleteByRequirements(
+    requirementIds: string[],
+    deletedAt: Date,
+  ): Promise<void> {
+    await this.submissions
+      .updateMany(
+        { requirementId: { $in: requirementIds }, deletedAt: null },
+        { $set: { deletedAt } },
+      )
+      .exec()
+  }
 }
 
 function toSubmission(document: SubmissionDocument): Submission {

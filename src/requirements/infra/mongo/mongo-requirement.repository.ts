@@ -38,15 +38,19 @@ export class MongoRequirementRepository implements RequirementRepository {
     }
   }
 
-  async unlink(employeeId: string, documentTypeId: string): Promise<boolean> {
-    const { modifiedCount } = await this.requirements
-      .updateOne(
+  async unlink(
+    employeeId: string,
+    documentTypeId: string,
+    deletedAt: Date,
+  ): Promise<string | null> {
+    const unlinked = await this.requirements
+      .findOneAndUpdate(
         { employeeId, documentTypeId, deletedAt: null },
-        { $set: { deletedAt: new Date() } },
+        { $set: { deletedAt } },
       )
       .exec()
 
-    return modifiedCount === 1
+    return unlinked && unlinked._id.toString()
   }
 
   async findById(id: string): Promise<Requirement | null> {

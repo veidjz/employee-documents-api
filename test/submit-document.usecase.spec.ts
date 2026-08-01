@@ -23,6 +23,10 @@ class CountingSubmissionRepository implements SubmissionRepository {
   listByRequirement(): Promise<Page<Submission>> {
     return Promise.reject(new Error('Unexpected history read'))
   }
+
+  softDeleteByRequirements(): Promise<void> {
+    return Promise.reject(new Error('Unexpected requirement cascade'))
+  }
 }
 
 class MissingRequirementRepository implements RequirementRepository {
@@ -38,7 +42,7 @@ class MissingRequirementRepository implements RequirementRepository {
     return Promise.reject(new Error('Unexpected link'))
   }
 
-  unlink(): Promise<boolean> {
+  unlink(): Promise<string | null> {
     return Promise.reject(new Error('Unexpected unlink'))
   }
 
