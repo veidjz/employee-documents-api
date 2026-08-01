@@ -123,14 +123,43 @@ describe('Stats overview (e2e)', () => {
     })
   })
 
+  it('counts as compliant only the employees whose requirements are all submitted', async () => {
+    const anaId = await createEmployee('Ana Souza', '52998224725')
+    const brunoId = await createEmployee('Bruno Lima', '11144477735')
+    const carlaId = await createEmployee('Carla Dias', '12345678909')
+    await createEmployee('Diego Reis', '98765432100')
+    const asoId = await createDocumentType('ASO')
+    const cnhId = await createDocumentType('CNH')
+
+    const [anaAso] = await link(anaId, [asoId, cnhId])
+    const [brunoAso] = await link(brunoId, [asoId])
+    await link(carlaId, [cnhId])
+
+    await submit(anaAso.id)
+    await submit(brunoAso.id)
+
+    const { employees } = await overview()
+
+    expect(employees).toEqual({
+      withRequirements: 3,
+      fullyCompliant: 1,
+      complianceRate: 0.3333,
+    })
+  })
+
   it('reports a null completion rate when there is no requirement', async () => {
-    const { requirements: totals } = await overview()
+    const { requirements: totals, employees } = await overview()
 
     expect(totals).toEqual({
       total: 0,
       submitted: 0,
       pending: 0,
       completionRate: null,
+    })
+    expect(employees).toEqual({
+      withRequirements: 0,
+      fullyCompliant: 0,
+      complianceRate: null,
     })
   })
 })
