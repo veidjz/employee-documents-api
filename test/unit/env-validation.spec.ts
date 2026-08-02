@@ -15,4 +15,10 @@ describe('environment validation', () => {
       }),
     ).toThrow('PORT must be an integer between 1 and 65535')
   })
+
+  it('falls back to the default port when it is absent', () => {
+    expect(
+      validateEnvironment({ MONGO_URL: 'mongodb+srv://cluster/app' }),
+    ).toEqual({ PORT: 3000, MONGO_URL: 'mongodb+srv://cluster/app' })
+  })
 })
