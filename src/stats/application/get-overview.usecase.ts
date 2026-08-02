@@ -2,15 +2,15 @@ import { Inject, Injectable } from '@nestjs/common'
 import {
   DOCUMENT_TYPE_REPOSITORY,
   type DocumentTypeRepository,
-} from '../../document-types/domain/document-type.repository'
+} from '@document-types/domain/document-type.repository'
 import {
   EMPLOYEE_REPOSITORY,
   type EmployeeRepository,
-} from '../../employees/domain/employee.repository'
+} from '@employees/domain/employee.repository'
 import {
   SUBMISSION_REPOSITORY,
   type SubmissionRepository,
-} from '../../requirements/domain/submission.repository'
+} from '@requirements/domain/submission.repository'
 import { Overview } from '../domain/overview'
 import { rate } from '../domain/rate'
 import {

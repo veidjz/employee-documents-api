@@ -2,11 +2,11 @@ import { Inject, Injectable } from '@nestjs/common'
 import {
   DOCUMENT_TYPE_REPOSITORY,
   type DocumentTypeRepository,
-} from '../../document-types/domain/document-type.repository'
+} from '@document-types/domain/document-type.repository'
 import {
   EMPLOYEE_REPOSITORY,
   type EmployeeRepository,
-} from '../../employees/domain/employee.repository'
+} from '@employees/domain/employee.repository'
 import { Page, Pagination } from '@shared/domain/page'
 import { RequirementDetails } from '../domain/requirement'
 import {
