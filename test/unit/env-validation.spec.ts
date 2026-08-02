@@ -6,4 +6,13 @@ describe('environment validation', () => {
       'MONGO_URL must be a mongodb connection string',
     )
   })
+
+  it('rejects a port outside the valid range', () => {
+    expect(() =>
+      validateEnvironment({
+        MONGO_URL: 'mongodb://localhost:27017/app',
+        PORT: '70000',
+      }),
+    ).toThrow('PORT must be an integer between 1 and 65535')
+  })
 })
