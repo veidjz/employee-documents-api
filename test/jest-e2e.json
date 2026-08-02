@@ -6,6 +6,14 @@
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
+  "moduleNameMapper": {
+    "^@shared/(.*)$": "<rootDir>/../src/shared/$1",
+    "^@employees/(.*)$": "<rootDir>/../src/employees/$1",
+    "^@document-types/(.*)$": "<rootDir>/../src/document-types/$1",
+    "^@requirements/(.*)$": "<rootDir>/../src/requirements/$1",
+    "^@stats/(.*)$": "<rootDir>/../src/stats/$1",
+    "^@app/(.*)$": "<rootDir>/../src/$1"
+  },
   "globalSetup": "<rootDir>/setup/global-setup.ts",
   "globalTeardown": "<rootDir>/setup/global-teardown.ts",
   "maxWorkers": 1,

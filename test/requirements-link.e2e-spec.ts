@@ -4,11 +4,11 @@ import { Test } from '@nestjs/testing'
 import { Model } from 'mongoose'
 import request from 'supertest'
 import { App } from 'supertest/types'
-import { AppModule } from '../src/app.module'
-import { DocumentTypeModel } from '../src/document-types/infra/mongo/document-type.schema'
-import { EmployeeModel } from '../src/employees/infra/mongo/employee.schema'
-import { RequirementListView } from '../src/requirements/infra/http/dto/requirement.view'
-import { RequirementModel } from '../src/requirements/infra/mongo/requirement.schema'
+import { AppModule } from '@app/app.module'
+import { DocumentTypeModel } from '@document-types/infra/mongo/document-type.schema'
+import { EmployeeModel } from '@employees/infra/mongo/employee.schema'
+import { RequirementListView } from '@requirements/infra/http/dto/requirement.view'
+import { RequirementModel } from '@requirements/infra/mongo/requirement.schema'
 
 describe('Requirements link (e2e)', () => {
   let app: INestApplication<App>

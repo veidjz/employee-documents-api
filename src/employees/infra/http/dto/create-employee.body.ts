@@ -1,5 +1,5 @@
 import { IsEmail, IsString, Length, registerDecorator } from 'class-validator'
-import { isValidCpf } from '../../../domain/cpf'
+import { isValidCpf } from '@employees/domain/cpf'
 
 function IsCpf() {
   return (target: object, propertyName: string) =>

@@ -1,5 +1,5 @@
-import { PageMeta } from '../../../../shared/http/page.view'
-import { Submission } from '../../../domain/submission'
+import { PageMeta } from '@shared/http/page.view'
+import { Submission } from '@requirements/domain/submission'
 
 export class SubmissionView implements Omit<
   Submission,

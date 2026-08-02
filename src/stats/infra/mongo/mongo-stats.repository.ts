@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, Types } from 'mongoose'
-import { RequirementModel } from '../../../requirements/infra/mongo/requirement.schema'
+import { RequirementModel } from '@requirements/infra/mongo/requirement.schema'
 import {
   EmployeeCompliance,
   RequirementAggregates,

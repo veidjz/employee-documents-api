@@ -1,5 +1,13 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@shared/*": ["./src/shared/*"],
+      "@employees/*": ["./src/employees/*"],
+      "@document-types/*": ["./src/document-types/*"],
+      "@requirements/*": ["./src/requirements/*"],
+      "@stats/*": ["./src/stats/*"],
+      "@app/*": ["./src/*"]
+    },
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,

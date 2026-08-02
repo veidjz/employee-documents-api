@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common'
-import { toPageView } from '../../../shared/http/page.view'
+import { toPageView } from '@shared/http/page.view'
 import { ListRequirementsUseCase } from '../../application/list-requirements.usecase'
 import { ListRequirementsQuery } from './dto/list-requirements.query'
 import { RequirementPageView } from './dto/requirement.view'

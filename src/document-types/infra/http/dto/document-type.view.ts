@@ -1,5 +1,5 @@
-import { PageMeta } from '../../../../shared/http/page.view'
-import { DocumentType } from '../../../domain/document-type'
+import { PageMeta } from '@shared/http/page.view'
+import { DocumentType } from '@document-types/domain/document-type'
 
 export class DocumentTypeView implements DocumentType {
   id!: string

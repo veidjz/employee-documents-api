@@ -1,4 +1,4 @@
-import { Overview } from '../../../domain/overview'
+import { Overview } from '@stats/domain/overview'
 
 export class RequirementTotalsView {
   total!: number

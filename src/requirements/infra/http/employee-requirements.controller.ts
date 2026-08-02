@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, HttpCode, Param, Post } from '@nestjs/common'
-import { ParseObjectIdPipe } from '../../../shared/http/object-id.pipe'
+import { ParseObjectIdPipe } from '@shared/http/object-id.pipe'
 import { LinkDocumentTypesUseCase } from '../../application/link-document-types.usecase'
 import { UnlinkDocumentTypeUseCase } from '../../application/unlink-document-type.usecase'
 import { LinkDocumentTypesBody } from './dto/link-document-types.body'

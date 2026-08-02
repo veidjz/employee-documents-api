@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { Page, Pagination } from '../../../shared/domain/page'
+import { Page, Pagination } from '@shared/domain/page'
 import { Submission } from '../../domain/submission'
 import {
   NewSubmission,

@@ -2,22 +2,22 @@ import { INestApplication } from '@nestjs/common'
 import { getModelToken } from '@nestjs/mongoose'
 import { Test } from '@nestjs/testing'
 import { Model } from 'mongoose'
-import { AppModule } from '../src/app.module'
+import { AppModule } from '@app/app.module'
 import {
   DOCUMENT_TYPE_REPOSITORY,
   DocumentTypeRepository,
-} from '../src/document-types/domain/document-type.repository'
-import { DocumentTypeModel } from '../src/document-types/infra/mongo/document-type.schema'
+} from '@document-types/domain/document-type.repository'
+import { DocumentTypeModel } from '@document-types/infra/mongo/document-type.schema'
 import {
   EMPLOYEE_REPOSITORY,
   EmployeeRepository,
-} from '../src/employees/domain/employee.repository'
-import { EmployeeModel } from '../src/employees/infra/mongo/employee.schema'
+} from '@employees/domain/employee.repository'
+import { EmployeeModel } from '@employees/infra/mongo/employee.schema'
 import {
   TRANSACTION_RUNNER,
   TransactionRunner,
-} from '../src/shared/domain/transaction-runner'
-import { MongoTransactionRunner } from '../src/shared/mongo/mongo-transaction.runner'
+} from '@shared/domain/transaction-runner'
+import { MongoTransactionRunner } from '@shared/mongo/mongo-transaction.runner'
 
 describe('Transaction boundary (e2e)', () => {
   let app: INestApplication
