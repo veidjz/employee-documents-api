@@ -147,4 +147,17 @@ describe('Employees (e2e)', () => {
       detail: 'Employee with this cpf already exists',
     })
   })
+
+  it('rejects a cpf whose check digits do not add up', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/employees')
+      .send({ ...anaSouza, cpf: '529.982.247-24' })
+      .expect(400)
+
+    expect(response.body).toMatchObject({
+      status: 400,
+      code: 'VALIDATION_FAILED',
+      errors: [{ field: 'cpf', message: 'cpf must be a valid CPF number' }],
+    })
+  })
 })
