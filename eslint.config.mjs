@@ -33,6 +33,32 @@ export default tseslint.config(
     },
   },
   {
+    files: ['{src,test,scripts}/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['../../../**'],
+              message: 'Import through a path alias instead of climbing directories.',
+            },
+            {
+              group: [
+                '@app/shared/**',
+                '@app/employees/**',
+                '@app/document-types/**',
+                '@app/requirements/**',
+                '@app/stats/**',
+              ],
+              message: 'Import through the alias of the module itself.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['src/*/domain/**'],
     rules: {
       'no-restricted-imports': [
