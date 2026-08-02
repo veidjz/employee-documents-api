@@ -22,12 +22,13 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,test,scripts}/**/*.ts\"",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e",
+    "check": "pnpm lint && pnpm typecheck && pnpm test",
     "test": "jest",
+    "test:unit": "jest --selectProjects unit",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "jest --selectProjects e2e",
     "db:up": "docker compose up -d --wait mongo",
     "db:indexes": "ts-node -r tsconfig-paths/register scripts/sync-indexes.ts",
     "db:seed": "ts-node -r tsconfig-paths/register scripts/seed.ts",
@@ -76,31 +77,6 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": ".",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "moduleNameMapper": {
-      "^@shared/(.*)$": "<rootDir>/src/shared/$1",
-      "^@employees/(.*)$": "<rootDir>/src/employees/$1",
-      "^@document-types/(.*)$": "<rootDir>/src/document-types/$1",
-      "^@requirements/(.*)$": "<rootDir>/src/requirements/$1",
-      "^@stats/(.*)$": "<rootDir>/src/stats/$1",
-      "^@app/(.*)$": "<rootDir>/src/$1"
-    },
-    "collectCoverageFrom": [
-      "src/**/*.(t|j)s"
-    ],
-    "coverageDirectory": "./coverage",
-    "testEnvironment": "node"
   },
   "packageManager": "pnpm@11.18.0+sha512.33d83c77da82f49fba836925c6f1b841181ec3132b670639bd012f7075f5c7cf634c5f870147c19aae7478fac01df09d8892e880454896edd23ee9b33757563c"
 }
