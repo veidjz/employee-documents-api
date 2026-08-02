@@ -50,8 +50,10 @@ pnpm start:dev
 ### Testes
 
 ```bash
-pnpm test           # unitários
-pnpm test:e2e       # ponta a ponta contra um MongoDB de verdade
+pnpm test           # as duas suítes
+pnpm test:unit      # só as unitárias
+pnpm test:e2e       # só as de ponta a ponta, contra um MongoDB de verdade
+pnpm test:cov       # as duas suítes com relatório de cobertura
 pnpm check          # lint, typecheck e as duas suítes
 ```
 
@@ -97,7 +99,7 @@ Isso é o que a inversão compra na prática: um caso de uso que precisa de atom
 
 **Não chamo isso de hexagonal.** Hexagonal define porta e adaptador para toda dependência externa, incluindo a de entrada, e aqui o controller do Nest fala direto com o caso de uso. Portas existem onde elas se pagam: persistência e fronteira transacional. Inventar uma porta de entrada para satisfazer o diagrama acrescentaria uma camada de tradução sem nenhum segundo adaptador do outro lado. Também não há DDD tático: não existe entidade rica, agregado com invariante interna nem repositório devolvendo objeto de domínio com comportamento. As regras deste domínio são de unicidade e de ordem de escrita, e elas vivem onde podem ser garantidas, que é o banco e a fronteira transacional, não num método de entidade.
 
-Fora dos módulos de negócio existem `src/shared/`, com o tratador global de exceções, o envelope de paginação e o `TransactionRunner`, e `src/config/`, com a validação das variáveis de ambiente. Todo teste vive em `test/`, fora de `src/`, que só tem código de produção.
+Fora dos módulos de negócio existem `src/shared/`, com o tratador global de exceções, o envelope de paginação e o `TransactionRunner`, e `src/config/`, com a validação das variáveis de ambiente. Todo teste vive em `test/`, fora de `src/`, que só tem código de produção: `test/unit/` para as unitárias, `test/e2e/` para as de ponta a ponta e `test/setup/` para o replica set em memória que as segundas consomem.
 
 ## Modelo de dados
 
