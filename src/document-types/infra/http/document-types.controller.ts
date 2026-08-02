@@ -8,6 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common'
+import { ApiProblemResponses } from '@shared/http/api-problem.decorator'
 import { ParseObjectIdPipe } from '@shared/http/object-id.pipe'
 import { PaginationQuery } from '@shared/http/pagination.query'
 import { toPageView } from '@shared/http/page.view'
@@ -29,11 +30,13 @@ export class DocumentTypesController {
   ) {}
 
   @Post()
+  @ApiProblemResponses(400, 409)
   create(@Body() body: CreateDocumentTypeBody): Promise<DocumentTypeView> {
     return this.createDocumentType.execute(body)
   }
 
   @Get()
+  @ApiProblemResponses(400)
   async list(
     @Query() pagination: PaginationQuery,
   ): Promise<DocumentTypePageView> {
@@ -45,6 +48,7 @@ export class DocumentTypesController {
 
   @Delete(':id')
   @HttpCode(204)
+  @ApiProblemResponses(400, 404)
   remove(@Param('id', ParseObjectIdPipe) id: string): Promise<void> {
     return this.softDeleteDocumentType.execute(id)
   }
