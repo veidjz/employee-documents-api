@@ -7,6 +7,12 @@ describe('environment validation', () => {
     )
   })
 
+  it('rejects an absent mongo url', () => {
+    expect(() => validateEnvironment({})).toThrow(
+      'MONGO_URL must be a mongodb connection string',
+    )
+  })
+
   it('rejects a port outside the valid range', () => {
     expect(() =>
       validateEnvironment({
