@@ -1,5 +1,5 @@
 import { IsIn, IsMongoId, IsOptional } from 'class-validator'
-import { PaginationQuery } from '../../../../shared/http/pagination.query'
+import { PaginationQuery } from '@shared/http/pagination.query'
 import {
   REQUIREMENT_STATUSES,
   type RequirementStatus,

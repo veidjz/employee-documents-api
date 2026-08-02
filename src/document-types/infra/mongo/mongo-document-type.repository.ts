@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { ConflictError } from '../../../shared/domain/domain-error'
-import { Page, Pagination } from '../../../shared/domain/page'
-import { isDuplicateKey } from '../../../shared/mongo/duplicate-key'
+import { ConflictError } from '@shared/domain/domain-error'
+import { Page, Pagination } from '@shared/domain/page'
+import { isDuplicateKey } from '@shared/mongo/duplicate-key'
 import { DocumentType } from '../../domain/document-type'
 import {
   DocumentTypeRepository,

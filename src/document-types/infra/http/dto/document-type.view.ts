@@ -1,4 +1,4 @@
-import { PageMeta } from '../../../../shared/http/page.view'
+import { PageMeta } from '@shared/http/page.view'
 import { DocumentType } from '../../../domain/document-type'
 
 export class DocumentTypeView implements DocumentType {

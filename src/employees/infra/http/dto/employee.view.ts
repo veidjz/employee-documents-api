@@ -1,4 +1,4 @@
-import { PageMeta } from '../../../../shared/http/page.view'
+import { PageMeta } from '@shared/http/page.view'
 import { Employee } from '../../../domain/employee'
 
 export class EmployeeView implements Employee {

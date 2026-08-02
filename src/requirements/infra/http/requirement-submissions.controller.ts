@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
-import { ParseObjectIdPipe } from '../../../shared/http/object-id.pipe'
-import { toPageView } from '../../../shared/http/page.view'
-import { PaginationQuery } from '../../../shared/http/pagination.query'
+import { ParseObjectIdPipe } from '@shared/http/object-id.pipe'
+import { toPageView } from '@shared/http/page.view'
+import { PaginationQuery } from '@shared/http/pagination.query'
 import { ListSubmissionsUseCase } from '../../application/list-submissions.usecase'
 import { SubmitDocumentUseCase } from '../../application/submit-document.usecase'
 import {

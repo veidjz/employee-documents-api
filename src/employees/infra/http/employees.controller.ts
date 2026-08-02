@@ -10,9 +10,9 @@ import {
   Res,
 } from '@nestjs/common'
 import type { Response } from 'express'
-import { ParseObjectIdPipe } from '../../../shared/http/object-id.pipe'
-import { PaginationQuery } from '../../../shared/http/pagination.query'
-import { toPageView } from '../../../shared/http/page.view'
+import { ParseObjectIdPipe } from '@shared/http/object-id.pipe'
+import { PaginationQuery } from '@shared/http/pagination.query'
+import { toPageView } from '@shared/http/page.view'
 import { CreateEmployeeUseCase } from '../../application/create-employee.usecase'
 import { GetEmployeeUseCase } from '../../application/get-employee.usecase'
 import { ListEmployeesUseCase } from '../../application/list-employees.usecase'
