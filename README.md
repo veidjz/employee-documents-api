@@ -32,7 +32,7 @@ pnpm db:indexes     # cria os índices
 pnpm db:seed        # opcional: popula com dados de exemplo
 ```
 
-A API responde em `http://localhost:3000`, a documentação interativa em `/docs` e a sonda em `/health`. `pnpm docker:down` derruba tudo.
+A API responde em `http://localhost:3000`, a documentação interativa em `/docs`, o documento OpenAPI que a alimenta em `/openapi.json` e a sonda em `/health`. `pnpm docker:down` derruba tudo.
 
 **O passo dos índices não é opcional.** A aplicação sobe com `autoIndex` desligado por decisão, explicada na seção de índices, então uma base recém-criada não tem nenhuma restrição de unicidade até o script rodar. Ele é idempotente e pode ser repetido à vontade.
 
@@ -189,6 +189,12 @@ São três mecanismos com três papéis, e nenhum substitui o outro:
 **`readConcern: snapshot` e `writeConcern: majority`.** Snapshot é o que dá à transação uma visão consistente do banco no instante em que ela começou, que é o pressuposto de ler `currentVersion` e incrementar sem enxergar escrita de concorrente no meio. Maioria é o que garante que o commit sobreviveu à confirmação de quórum antes de a API responder 201. Num replica set de um nó a maioria é barata, mas o código não fica dependendo de o cluster ter um nó só.
 
 Cada um desses mecanismos tem um teste que reprova quando ele é desligado, e não apenas um teste de caminho feliz que passaria sem eles.
+
+## Contrato de erro
+
+Toda falha responde `application/problem+json` no formato do Problem Details (RFC 9457), com dois campos além dos da especificação: `code`, identificador estável que o cliente pode comparar sem depender de texto (`EMPLOYEE_ALREADY_EXISTS`, `REQUIREMENT_ALREADY_LINKED`), e `errors`, presente só na falha de validação, com o campo e a mensagem de cada entrada rejeitada. O `title` vem da tabela de status do próprio Node, então nenhuma frase de status é digitada à mão.
+
+O documento OpenAPI declara essas respostas rota a rota, e não como texto solto: `@ApiProblemResponses(400, 404, 409)` aponta para o mesmo `ProblemView` que o tratador global de exceções constrói. A ligação entre os dois é responsabilidade do compilador, porque o corpo devolvido pelo filtro é conferido com `satisfies ProblemView`. Renomear um campo lá quebra o `typecheck`, em vez de deixar a documentação mentir em silêncio. Um teste fecha o par fixando quais status cada rota declara, de modo que uma rota nova sem contrato de erro aparece como falha e não como omissão.
 
 ## Logs e rastreio
 
