@@ -1,4 +1,4 @@
-import { Page, Pagination } from '../../shared/domain/page'
+import { Page, Pagination } from '@shared/domain/page'
 import { Employee } from './employee'
 
 export const EMPLOYEE_REPOSITORY = Symbol('EMPLOYEE_REPOSITORY')

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { NotFoundError } from '../../shared/domain/domain-error'
+import { NotFoundError } from '@shared/domain/domain-error'
 import { Employee } from '../domain/employee'
 import {
   EMPLOYEE_REPOSITORY,

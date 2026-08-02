@@ -1,5 +1,5 @@
-import { DocumentType } from '../../document-types/domain/document-type'
-import { Employee } from '../../employees/domain/employee'
+import { DocumentType } from '@document-types/domain/document-type'
+import { Employee } from '@employees/domain/employee'
 
 export type RequirementStatus = 'PENDING' | 'SUBMITTED'
 

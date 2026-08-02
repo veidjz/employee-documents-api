@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { NotFoundError } from '../../shared/domain/domain-error'
+import { NotFoundError } from '@shared/domain/domain-error'
 import {
   TRANSACTION_RUNNER,
   type TransactionRunner,
-} from '../../shared/domain/transaction-runner'
+} from '@shared/domain/transaction-runner'
 import {
   REQUIREMENT_REPOSITORY,
   type RequirementRepository,

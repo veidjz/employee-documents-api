@@ -1,6 +1,6 @@
-import { DocumentType } from '../../document-types/domain/document-type'
-import { Employee } from '../../employees/domain/employee'
-import { Submission } from '../../requirements/domain/submission'
+import { DocumentType } from '@document-types/domain/document-type'
+import { Employee } from '@employees/domain/employee'
+import { Submission } from '@requirements/domain/submission'
 
 export type RequirementTotals = {
   total: number
