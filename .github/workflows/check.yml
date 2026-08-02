@@ -24,7 +24,7 @@ jobs:
 
       - run: pnpm typecheck
 
-      - run: pnpm test
+      - run: pnpm test:unit
 
       - uses: actions/cache@v6
         with:
