@@ -1,4 +1,4 @@
-import { isValidCpf, normalizeCpf } from '../src/employees/domain/cpf'
+import { isValidCpf, normalizeCpf } from '@employees/domain/cpf'
 
 describe('cpf', () => {
   it('strips every character that is not a digit', () => {

@@ -4,9 +4,9 @@ import { Test } from '@nestjs/testing'
 import { Model } from 'mongoose'
 import request from 'supertest'
 import { App } from 'supertest/types'
-import { AppModule } from '../src/app.module'
-import { EmployeeView } from '../src/employees/infra/http/dto/employee.view'
-import { EmployeeModel } from '../src/employees/infra/mongo/employee.schema'
+import { AppModule } from '@app/app.module'
+import { EmployeeView } from '@employees/infra/http/dto/employee.view'
+import { EmployeeModel } from '@employees/infra/mongo/employee.schema'
 
 const anaSouza = {
   name: 'Ana Souza',

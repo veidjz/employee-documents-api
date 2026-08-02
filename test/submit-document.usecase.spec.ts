@@ -1,11 +1,11 @@
-import { Requirement } from '../src/requirements/domain/requirement'
-import { RequirementRepository } from '../src/requirements/domain/requirement.repository'
-import { Submission } from '../src/requirements/domain/submission'
-import { SubmissionRepository } from '../src/requirements/domain/submission.repository'
-import { SubmitDocumentUseCase } from '../src/requirements/application/submit-document.usecase'
-import { NotFoundError } from '../src/shared/domain/domain-error'
-import { Page } from '../src/shared/domain/page'
-import { TransactionRunner } from '../src/shared/domain/transaction-runner'
+import { Requirement } from '@requirements/domain/requirement'
+import { RequirementRepository } from '@requirements/domain/requirement.repository'
+import { Submission } from '@requirements/domain/submission'
+import { SubmissionRepository } from '@requirements/domain/submission.repository'
+import { SubmitDocumentUseCase } from '@requirements/application/submit-document.usecase'
+import { NotFoundError } from '@shared/domain/domain-error'
+import { Page } from '@shared/domain/page'
+import { TransactionRunner } from '@shared/domain/transaction-runner'
 
 class CountingSubmissionRepository implements SubmissionRepository {
   inserts = 0

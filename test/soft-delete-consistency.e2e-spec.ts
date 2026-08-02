@@ -4,11 +4,11 @@ import { Test } from '@nestjs/testing'
 import { Model } from 'mongoose'
 import request from 'supertest'
 import { App } from 'supertest/types'
-import { AppModule } from '../src/app.module'
-import { DocumentTypeModel } from '../src/document-types/infra/mongo/document-type.schema'
-import { EmployeeModel } from '../src/employees/infra/mongo/employee.schema'
-import { RequirementModel } from '../src/requirements/infra/mongo/requirement.schema'
-import { SubmissionModel } from '../src/requirements/infra/mongo/submission.schema'
+import { AppModule } from '@app/app.module'
+import { DocumentTypeModel } from '@document-types/infra/mongo/document-type.schema'
+import { EmployeeModel } from '@employees/infra/mongo/employee.schema'
+import { RequirementModel } from '@requirements/infra/mongo/requirement.schema'
+import { SubmissionModel } from '@requirements/infra/mongo/submission.schema'
 
 describe('Soft delete consistency (e2e)', () => {
   let app: INestApplication<App>

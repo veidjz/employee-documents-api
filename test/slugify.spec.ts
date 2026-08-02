@@ -1,4 +1,4 @@
-import { slugify } from '../src/document-types/domain/slugify'
+import { slugify } from '@document-types/domain/slugify'
 
 describe('slugify', () => {
   it('collapses accents, casing and repeated separators into one slug', () => {

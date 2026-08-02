@@ -4,9 +4,9 @@ import { Test } from '@nestjs/testing'
 import { Model } from 'mongoose'
 import request from 'supertest'
 import { App } from 'supertest/types'
-import { AppModule } from '../src/app.module'
-import { DocumentTypeView } from '../src/document-types/infra/http/dto/document-type.view'
-import { DocumentTypeModel } from '../src/document-types/infra/mongo/document-type.schema'
+import { AppModule } from '@app/app.module'
+import { DocumentTypeView } from '@document-types/infra/http/dto/document-type.view'
+import { DocumentTypeModel } from '@document-types/infra/mongo/document-type.schema'
 
 describe('Document types (e2e)', () => {
   let app: INestApplication<App>

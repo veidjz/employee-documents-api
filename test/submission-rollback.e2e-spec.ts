@@ -4,18 +4,18 @@ import { Test } from '@nestjs/testing'
 import { Model } from 'mongoose'
 import request from 'supertest'
 import { App } from 'supertest/types'
-import { AppModule } from '../src/app.module'
-import { DocumentTypeModel } from '../src/document-types/infra/mongo/document-type.schema'
-import { EmployeeModel } from '../src/employees/infra/mongo/employee.schema'
-import { Submission } from '../src/requirements/domain/submission'
+import { AppModule } from '@app/app.module'
+import { DocumentTypeModel } from '@document-types/infra/mongo/document-type.schema'
+import { EmployeeModel } from '@employees/infra/mongo/employee.schema'
+import { Submission } from '@requirements/domain/submission'
 import {
   NewSubmission,
   SUBMISSION_REPOSITORY,
-} from '../src/requirements/domain/submission.repository'
-import { RequirementListView } from '../src/requirements/infra/http/dto/requirement.view'
-import { MongoSubmissionRepository } from '../src/requirements/infra/mongo/mongo-submission.repository'
-import { RequirementModel } from '../src/requirements/infra/mongo/requirement.schema'
-import { SubmissionModel } from '../src/requirements/infra/mongo/submission.schema'
+} from '@requirements/domain/submission.repository'
+import { RequirementListView } from '@requirements/infra/http/dto/requirement.view'
+import { MongoSubmissionRepository } from '@requirements/infra/mongo/mongo-submission.repository'
+import { RequirementModel } from '@requirements/infra/mongo/requirement.schema'
+import { SubmissionModel } from '@requirements/infra/mongo/submission.schema'
 
 class FailingOnSecondInsert extends MongoSubmissionRepository {
   private inserts = 0
