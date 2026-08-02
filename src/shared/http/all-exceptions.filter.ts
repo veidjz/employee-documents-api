@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { DomainError } from '../domain/domain-error'
+import { FieldErrorView, ProblemView } from './problem.view'
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -29,7 +30,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         instance: context.getRequest<Request>().url,
         code,
         ...(errors && { errors }),
-      })
+      } satisfies ProblemView)
   }
 
   private describe(exception: unknown): ProblemPayload & {
@@ -67,7 +68,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
 type ProblemPayload = {
   code: string
-  errors?: { field: string; message: string }[]
+  errors?: FieldErrorView[]
 }
 
 function isProblemPayload(payload: string | object): payload is ProblemPayload {

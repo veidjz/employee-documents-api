@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core'
 import { ConfigService } from '@nestjs/config'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { apiReference } from '@scalar/nestjs-api-reference'
+import type { Request, Response } from 'express'
 import { Logger } from 'nestjs-pino'
 import { AppModule } from './app.module'
 
@@ -19,6 +20,9 @@ async function bootstrap() {
       .build(),
   )
   app.use('/docs', apiReference({ content: openApiDocument }))
+  app.use('/openapi.json', (_request: Request, response: Response) =>
+    response.json(openApiDocument),
+  )
 
   await app.listen(app.get(ConfigService).getOrThrow<number>('PORT'))
 }

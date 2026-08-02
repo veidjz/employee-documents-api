@@ -10,6 +10,7 @@ import {
   Res,
 } from '@nestjs/common'
 import type { Response } from 'express'
+import { ApiProblemResponses } from '@shared/http/api-problem.decorator'
 import { ParseObjectIdPipe } from '@shared/http/object-id.pipe'
 import { PaginationQuery } from '@shared/http/pagination.query'
 import { toPageView } from '@shared/http/page.view'
@@ -30,6 +31,7 @@ export class EmployeesController {
   ) {}
 
   @Post()
+  @ApiProblemResponses(400, 409)
   async create(
     @Body() body: CreateEmployeeBody,
     @Res({ passthrough: true }) response: Response,
@@ -41,17 +43,20 @@ export class EmployeesController {
   }
 
   @Get()
+  @ApiProblemResponses(400)
   async list(@Query() pagination: PaginationQuery): Promise<EmployeePageView> {
     return toPageView(await this.listEmployees.execute(pagination), pagination)
   }
 
   @Get(':id')
+  @ApiProblemResponses(400, 404)
   get(@Param('id', ParseObjectIdPipe) id: string): Promise<EmployeeView> {
     return this.getEmployee.execute(id)
   }
 
   @Delete(':id')
   @HttpCode(204)
+  @ApiProblemResponses(400, 404)
   remove(@Param('id', ParseObjectIdPipe) id: string): Promise<void> {
     return this.softDeleteEmployee.execute(id)
   }

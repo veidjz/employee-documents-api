@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
+import { ApiProblemResponses } from '@shared/http/api-problem.decorator'
 import { ParseObjectIdPipe } from '@shared/http/object-id.pipe'
 import { toPageView } from '@shared/http/page.view'
 import { PaginationQuery } from '@shared/http/pagination.query'
@@ -19,6 +20,7 @@ export class RequirementSubmissionsController {
   ) {}
 
   @Post()
+  @ApiProblemResponses(400, 404)
   async submit(
     @Param('requirementId', ParseObjectIdPipe) requirementId: string,
     @Body() body: SubmitDocumentBody,
@@ -29,6 +31,7 @@ export class RequirementSubmissionsController {
   }
 
   @Get()
+  @ApiProblemResponses(400, 404)
   async list(
     @Param('requirementId', ParseObjectIdPipe) requirementId: string,
     @Query() pagination: PaginationQuery,
