@@ -12,6 +12,7 @@ import { EmployeesModule } from './employees/employees.module'
 import { RequirementsModule } from './requirements/requirements.module'
 import { AllExceptionsFilter } from './shared/http/all-exceptions.filter'
 import { HealthController } from './shared/http/health.controller'
+import { RootController } from './shared/http/root.controller'
 import { validationPipe } from './shared/http/validation.pipe'
 import { StatsModule } from './stats/stats.module'
 
@@ -55,7 +56,7 @@ mongoose.set('transactionAsyncLocalStorage', true)
     RequirementsModule,
     StatsModule,
   ],
-  controllers: [HealthController],
+  controllers: [HealthController, RootController],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     { provide: APP_PIPE, useValue: validationPipe },
