@@ -97,6 +97,8 @@ src/employees/
 
 Isso é o que a inversão compra na prática: um caso de uso que precisa de atomicidade não consegue injetar `Connection` nem receber `ClientSession`, porque o lint não deixa. Ele recebe a porta `TransactionRunner` e chama `run`.
 
+Cada módulo tem um path alias, e todo import que sai do módulo passa por ele: `@shared/domain/page`, `@employees/domain/employee.repository`. Dentro do módulo o caminho continua relativo. A separação existe para que a fronteira apareça no import, e não para encurtar texto, e ela também é lint.
+
 **Não chamo isso de hexagonal.** Hexagonal define porta e adaptador para toda dependência externa, incluindo a de entrada, e aqui o controller do Nest fala direto com o caso de uso. Portas existem onde elas se pagam: persistência e fronteira transacional. Inventar uma porta de entrada para satisfazer o diagrama acrescentaria uma camada de tradução sem nenhum segundo adaptador do outro lado. Também não há DDD tático: não existe entidade rica, agregado com invariante interna nem repositório devolvendo objeto de domínio com comportamento. As regras deste domínio são de unicidade e de ordem de escrita, e elas vivem onde podem ser garantidas, que é o banco e a fronteira transacional, não num método de entidade.
 
 Fora dos módulos de negócio existem `src/shared/`, com o tratador global de exceções, o envelope de paginação e o `TransactionRunner`, e `src/config/`, com a validação das variáveis de ambiente. Todo teste vive em `test/`, fora de `src/`, que só tem código de produção: `test/unit/` para as unitárias, `test/e2e/` para as de ponta a ponta e `test/setup/` para o replica set em memória que as segundas consomem.
