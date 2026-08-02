@@ -7,11 +7,11 @@ import {
   EMPLOYEE_REPOSITORY,
   type EmployeeRepository,
 } from '../../employees/domain/employee.repository'
-import { NotFoundError } from '../../shared/domain/domain-error'
+import { NotFoundError } from '@shared/domain/domain-error'
 import {
   TRANSACTION_RUNNER,
   type TransactionRunner,
-} from '../../shared/domain/transaction-runner'
+} from '@shared/domain/transaction-runner'
 import { RequirementDetails } from '../domain/requirement'
 import {
   REQUIREMENT_REPOSITORY,

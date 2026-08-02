@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { NotFoundError } from '../../shared/domain/domain-error'
-import { Page, Pagination } from '../../shared/domain/page'
+import { NotFoundError } from '@shared/domain/domain-error'
+import { Page, Pagination } from '@shared/domain/page'
 import {
   REQUIREMENT_REPOSITORY,
   type RequirementRepository,

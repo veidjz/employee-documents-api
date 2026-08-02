@@ -1,4 +1,4 @@
-import { Page, Pagination } from '../../shared/domain/page'
+import { Page, Pagination } from '@shared/domain/page'
 import { Requirement, RequirementStatus } from './requirement'
 
 export const REQUIREMENT_REPOSITORY = Symbol('REQUIREMENT_REPOSITORY')

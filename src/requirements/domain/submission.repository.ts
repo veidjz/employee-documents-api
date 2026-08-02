@@ -1,4 +1,4 @@
-import { Page, Pagination } from '../../shared/domain/page'
+import { Page, Pagination } from '@shared/domain/page'
 import { Submission } from './submission'
 
 export const SUBMISSION_REPOSITORY = Symbol('SUBMISSION_REPOSITORY')

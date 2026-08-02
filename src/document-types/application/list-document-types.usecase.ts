@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Page, Pagination } from '../../shared/domain/page'
+import { Page, Pagination } from '@shared/domain/page'
 import { DocumentType } from '../domain/document-type'
 import {
   DOCUMENT_TYPE_REPOSITORY,

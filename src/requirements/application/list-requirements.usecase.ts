@@ -7,7 +7,7 @@ import {
   EMPLOYEE_REPOSITORY,
   type EmployeeRepository,
 } from '../../employees/domain/employee.repository'
-import { Page, Pagination } from '../../shared/domain/page'
+import { Page, Pagination } from '@shared/domain/page'
 import { RequirementDetails } from '../domain/requirement'
 import {
   REQUIREMENT_REPOSITORY,
