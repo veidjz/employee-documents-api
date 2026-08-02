@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { getConnectionToken } from '@nestjs/mongoose'
 import { Connection } from 'mongoose'
-import { AppModule } from '../src/app.module'
+import { AppModule } from '@app/app.module'
 
 async function syncIndexes() {
   const application = await NestFactory.createApplicationContext(AppModule, {

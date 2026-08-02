@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core'
 import { getModelToken } from '@nestjs/mongoose'
 import { Model, Types } from 'mongoose'
-import { AppModule } from '../src/app.module'
-import { DocumentTypeModel } from '../src/document-types/infra/mongo/document-type.schema'
-import { EmployeeModel } from '../src/employees/infra/mongo/employee.schema'
-import { RequirementModel } from '../src/requirements/infra/mongo/requirement.schema'
-import { SubmissionModel } from '../src/requirements/infra/mongo/submission.schema'
+import { AppModule } from '@app/app.module'
+import { DocumentTypeModel } from '@document-types/infra/mongo/document-type.schema'
+import { EmployeeModel } from '@employees/infra/mongo/employee.schema'
+import { RequirementModel } from '@requirements/infra/mongo/requirement.schema'
+import { SubmissionModel } from '@requirements/infra/mongo/submission.schema'
 
 function objectId(suffix: string) {
   return new Types.ObjectId(suffix.padStart(24, '0'))
