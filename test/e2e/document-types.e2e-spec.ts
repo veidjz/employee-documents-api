@@ -83,4 +83,27 @@ describe('Document types (e2e)', () => {
       meta: { total: 1 },
     })
   })
+
+  it('rejects removing a document type that was already removed', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/document-types')
+      .send({ name: 'Comprovante de Residencia' })
+      .expect(201)
+
+    const id = (created.body as DocumentTypeView).id
+
+    await request(app.getHttpServer())
+      .delete(`/document-types/${id}`)
+      .expect(204)
+
+    const repeated = await request(app.getHttpServer())
+      .delete(`/document-types/${id}`)
+      .expect(404)
+
+    expect(repeated.body).toMatchObject({
+      status: 404,
+      code: 'DOCUMENT_TYPE_NOT_FOUND',
+      instance: `/document-types/${id}`,
+    })
+  })
 })
