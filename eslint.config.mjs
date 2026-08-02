@@ -11,6 +11,16 @@ const importStyle = [
   },
   {
     group: [
+      '../../shared/**',
+      '../../employees/**',
+      '../../document-types/**',
+      '../../requirements/**',
+      '../../stats/**',
+    ],
+    message: 'Import through the alias of the module being crossed.',
+  },
+  {
+    group: [
       '@app/shared/**',
       '@app/employees/**',
       '@app/document-types/**',
