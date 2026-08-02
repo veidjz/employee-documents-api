@@ -2,7 +2,7 @@ import { PageMeta } from '@shared/http/page.view'
 import {
   RequirementDetails,
   RequirementStatus,
-} from '../../../domain/requirement'
+} from '@requirements/domain/requirement'
 
 export class RequirementEmployeeView {
   id!: string

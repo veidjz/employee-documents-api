@@ -3,7 +3,7 @@ import { PaginationQuery } from '@shared/http/pagination.query'
 import {
   REQUIREMENT_STATUSES,
   type RequirementStatus,
-} from '../../../domain/requirement'
+} from '@requirements/domain/requirement'
 
 export class ListRequirementsQuery extends PaginationQuery {
   @IsOptional()

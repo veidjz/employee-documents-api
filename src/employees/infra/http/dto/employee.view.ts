@@ -1,5 +1,5 @@
 import { PageMeta } from '@shared/http/page.view'
-import { Employee } from '../../../domain/employee'
+import { Employee } from '@employees/domain/employee'
 
 export class EmployeeView implements Employee {
   id!: string
