@@ -1,4 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common'
+import { ApiProblemResponses } from '@shared/http/api-problem.decorator'
 import { toPageView } from '@shared/http/page.view'
 import { ListRequirementsUseCase } from '../../application/list-requirements.usecase'
 import { ListRequirementsQuery } from './dto/list-requirements.query'
@@ -9,6 +10,7 @@ export class RequirementsController {
   constructor(private readonly listRequirements: ListRequirementsUseCase) {}
 
   @Get()
+  @ApiProblemResponses(400)
   async list(
     @Query() query: ListRequirementsQuery,
   ): Promise<RequirementPageView> {

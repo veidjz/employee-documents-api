@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, HttpCode, Param, Post } from '@nestjs/common'
+import { ApiProblemResponses } from '@shared/http/api-problem.decorator'
 import { ParseObjectIdPipe } from '@shared/http/object-id.pipe'
 import { LinkDocumentTypesUseCase } from '../../application/link-document-types.usecase'
 import { UnlinkDocumentTypeUseCase } from '../../application/unlink-document-type.usecase'
@@ -13,6 +14,7 @@ export class EmployeeRequirementsController {
   ) {}
 
   @Post()
+  @ApiProblemResponses(400, 404, 409)
   async link(
     @Param('employeeId', ParseObjectIdPipe) employeeId: string,
     @Body() body: LinkDocumentTypesBody,
@@ -27,6 +29,7 @@ export class EmployeeRequirementsController {
 
   @Delete(':documentTypeId')
   @HttpCode(204)
+  @ApiProblemResponses(400, 404)
   unlink(
     @Param('employeeId', ParseObjectIdPipe) employeeId: string,
     @Param('documentTypeId', ParseObjectIdPipe) documentTypeId: string,
